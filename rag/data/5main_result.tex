@@ -1,0 +1,142 @@
+
+% \input{fig/robustness}
+
+\section{Experimental Results and Analyses}
+In this section, we show the overall experimental results with in-depth analyses of our framework. 
+% In this study, we conducted a comparative analysis between sentence-level and traditional passage-level reranking across various open-domain QA datasets. Our findings, as demonstrated in Table \ref{tab:main1}, clearly show that sentence-level reranking consistently outperforms passage-level reranking. This superiority is evident across all datasets and scenarios, with sentence-level reranking exhibiting higher average accuracies. When considering the initial retrieval of the top-20 documents, there is a noticeable improvement in performance from [specific lower percentage] to [specific higher percentage] with sentence-level reranking, underlining its efficacy. The benefits of sentence-level reranking are particularly pronounced in specialized datasets such as the ever-evolving RealtimeQA (RQA) and domain-specific SciQ (SQ) and BioASQ (BASQ). These results suggest that sentence-level reranking is more adept at handling dynamic and niche content compared to general QA datasets like NQ, TQA, and SQuAD.
+
+% Sentence-level reranking이 꾸준히 passage-level reranking을 다양한 데이터셋에서 outperform한다. 모든 시나리오와 데이터셋에서 average(AVG)가 passage-level reranking보다 sentence-level reranking이 높은 것을 보면 확인할 수 있다. 그리고 initial retrieval이 Top-20을 고려할 때가 더 평균적으로 ~에서 ~로 상승하여 sentence-level의 효과가 두드러진다. 기존 reranking이 익숙한 태스크인 일반적인 QA 데이터셋인 NQ, TQA, SQD보다 특수한 데이터셋인 ever-evolving RQA, domain specific SQ,BASQ에서 특히 더 효과가 더 두드러지는 것을 확인할 수 있다. 마찬가지로 Top-100을 고려할 떄는 ~에서 ~로 상승하였다. 대체적으로 초기 top-k를 증가시켰을 때 성능 또한 증가하는 것을 확인할 수 있다.이는 또한 기존 passage-level reranking 모델들이 더 작은 granularity 단위인 sentence의 relevance도 효과적으로 평가할 수 있음을 의미한다.  하지만 dense retrieval and reranker는 성능이 성능이 상승하는 것에 대비해, BM25는 top-20에서 top-100이 고려될 때 성능이 크게 하락하였다. 이는 단순히 lexical 기반으로 low granularity인 문장단위의 relevance을 확인하는 것은 어렵다는 것을 의미하며 semanctic meaning을 고려하는 것이 중요함을 시사한다.  Furthermore, rerankers based on pre-trained models such as T5 and LLMs perform exceptionally well on specialized datasets. This suggests that the generalization capabilities of pre-trained language models significantly contribute to their effectiveness in sentence-level reranking tasks.
+
+% Our study indicates that sentence-level reranking consistently outperforms traditional passage-level reranking across standard QA datasets such as NQ, TQA, and SQD, and shows even more significant improvements on up-to-date or domain-specific datasets like RQA, SQ, and BASQ. Notably, all rerankers, except for BM25, can assess relevance at finer granularity levels like the sentence level.
+
+
+
+
+
+% \input{table/main1-2}
+
+
+\paragraph{Main Results.} 
+
+First of all, Table \ref{tab:main1} shows that our \textit{DSLR}-refined top-1 document consistently outperforms the original top-1 document across all datasets and scenarios, despite reduced token counts. This confirms our hypothesis that the redundant information within the fix-sized passages adversely affects the RAG performance and highlights the importance of providing only query-relevant information in RAG with finer-grained sentences.
+
+Furthermore, \textit{DSLR} also shows performance enhancement over specialized datasets, such as ever-evolving RQA and domain-specific SQ and BASQ datasets.
+Specifically, the re-rankers based on pre-trained models such as T5 and the LLM demonstrate remarkable performance improvement.
+Given that \textit{DSLR} requires no additional training, the robust and effective performance suggests its applicability to diverse real-world scenarios, particularly where queries frequently change across different timelines and domains.
+% \input{fig/precision}
+
+% \noindent 
+% In contrast, while dense retrieval and re-rankers show performance improvements, the performance of BM25 \textit{DSLR} significantly decreases compared to initial retrieval which is not re-ranking. This decline suggests difficulties in leveraging purely lexical-based methods to assess low granularity sentence-level relevance, underscoring the importance of considering semantic meaning in retrieval tasks. Additionally, re-rankers based on pre-trained models such as T5 and LLMs exhibit exceptional performance on specialized datasets, which demonstrates the robust generalization capabilities of pre-trained language models, significantly enhancing their effectiveness in sentence-level re-ranking tasks.
+
+%While dense retrieval and re-rankers show performance improvements, the performance of BM25 (\textit{DSLR}) significantly decreases compared to initial retrieval without re-ranking. This decline highlights the challenges of using purely lexical-based methods for low granularity sentence-level relevance, emphasizing the need for semantic understanding in sentence ranking tasks. Conversely, re-rankers based on pre-trained models such as T5 and LLMs demonstrate exceptional performance on specialized datasets, showcasing their robust generalization capabilities and effectiveness in sentence-level re-ranking tasks. Interestingly, unsupervised re-ranking using LLMs shows strong performance in sentence-level re-ranking despite not being trained on document re-ranking tasks, suggesting potential for further development in future work.
+
+
+
+
+% While dense retrievers and fine-tuned ranking models demonstrate improvements as re-rankers, BM25 as a re-ranker significantly underperforms in some cases (SQD, RQA and BASQ). This highlights the limitations of keyword-matching approaches for assessing low-granularity, sentence-level relevance, underscoring the necessity for semantic understanding in sentence ranking tasks.
+% Furthermore, the performance with the off-the-shelf re-ranking models, which are initially designed for passage-level, are even capable of effectively measuring relevance at a finer granularity of sentences.
+% Interestingly, even though it is not specifically trained for ranking tasks, the unsupervised re-ranker using a recent LLM shows remarkable performance in sentence-level re-ranking. This suggests there is good potential for further improvement as the LLMs become more powerful. 
+
+
+
+
+
+\paragraph{\textit{DSLR} in Multiple Passages.}
+To assess the effectiveness and efficiency of \textit{DSLR} in multiple passages, we gradually increased the number of documents \(N\) and compared the performance, token count, and end-to-end (E2E) latency\footnote{These experiments were conducted using four V100 GPUs.} of the original top-\(N\) documents with those refined by \textit{DSLR}. 
+
+As shown in the left panel of Figure \ref{fig:various}, both sets of documents show consistent performance improvements as \(N\) increases. However, \textit{DSLR} consistently outperforms the original documents across all \(N\) levels, with more notable differences at lower \(N\) values. This suggests that \textit{DSLR} can significantly enhance performance in RAG, even as the number of documents increases.
+
+Due to the quadratic increase in memory and time requirements with the number of tokens in transformer-based LLMs, reducing the token count is crucial for improving efficiency \cite{attention}. As depicted in the center and right panels of Figure \ref{fig:various}, \textit{DSLR} substantially reduces the token count compared to the original documents, with the difference becoming more significant as \(N\) increases. This reduction in tokens also decreases E2E latency in all scenarios except top-1. Notably, at top-10, while the performance difference is minimal (39.6 vs. 39.7), the token count reduction from 1,713 to 577 (nearly 2.97 times) and the corresponding E2E latency reduction from 7.382 seconds to 5.422 seconds (nearly 2 seconds) demonstrate that \textit{DSLR} can enhance both performance and efficiency in RAG. Detailed results are available in Table \ref{tab:detail_N}.
+%To evaluate the robustness of \textit{DSLR}, we vary the context length \(L\) at {100, 200, 300, 400, 500} and adjusted the initial retrieval depth top-\(N\) at {5, 10, 20, 50, 100}, comparing its performance with passage-level re-ranking on the NQ dataset. Figure \ref{fig:robustness} displays the results of these experiments. In all scenarios, our method consistently outperforms passage-level re-ranking. Notably, as \(L\) increases, the performance of it improves, and similarly, as \(N\) is increased, the performance also rises before converging. These findings demonstrate the robustness of \textit{DSLR} across various settings of \(L\) and \(N\).
+%Specifically, as the context length increases, the performance improves, and similarly, as \(N\) is increased, the performance also rises before converging.
+%These findings demonstrate the robustness of \textit{DSLR} across various settings of \(L\) and \(N\).
+
+\input{fig/oracle}
+
+\paragraph{Impact of Threshold Adjustment.}
+% \textit{DSLR} utilizes a predefined threshold \( T \) to eliminate irrelevant content. We empirically set \( T \) at the 90th percentile of relevance scores from a random sample of 1000 documents across the TQA, NQ, and SQD datasets. 
+To examine the impact of varying \( T \), we adjusted the threshold in increments of 10, starting from the 10th percentile, and measured the resulting performance. Additionally, to explore the theoretical maximum performance of our method, we configured an oracle setting where any correct response, regardless of the threshold setting, was counted as correct.
+
+As shown in Figure \ref{fig:oracle}, increasing the threshold \( T \) generally improves performance by removing irrelevant content, thus reducing the number of tokens. However, our experimental results revealed that the performance at the 90th percentile threshold was 29.4, while a lower 80th percentile threshold yielded better performance at 29.9. This indicates that an overly stringent threshold can also remove essential information, suggesting that task-specific threshold fine-tuning could improve results.
+
+Furthermore, in the oracle setting, accuracy significantly improved to 34.1, and the token count was reduced to 77. This shows a marked performance improvement over the best performing threshold (80th percentile), with a similar reduction in tokens. This result implies that dynamically adjusting the threshold based on the query could achieve substantial performance improvements with a comparable number of tokens, suggesting an area for future work. Detailed results are available in Table \ref{tab:detailed_oracle}.
+
+\label{various_threshold}
+
+\input{fig/distribution} 
+\input{fig/effectiveness}
+\paragraph{Token Distribution and Refinement Strategies.}
+
+\input{fig/recomp}
+The left panel of Figure \ref{fig:distribution} displays the distribution of token counts in documents refined by \textit{DSLR}. Unlike methods that trim passages to a fixed length, \textit{DSLR} reduces token counts based on a relevance score threshold, resulting in a wide distribution of token counts, with many instances nearly devoid of external knowledge. The average token count post-refinement is 46. We analyzed performance by comparing this approach with cases where passages are consistently cut to 46 tokens: one where passages are simply truncated at 46 tokens, another using sentence-level re-ranking to select the most relevant sentences up to 46 tokens, and a third where sentences are randomly cut to 46 tokens.
+
+As demonstrated in the right panel of Figure \ref{fig:distribution}, \textit{DSLR}, which trims content based on relevance, significantly outperforms methods that trim to a fixed length, improving scores from 25.3 to 33.7. This suggests that trimming based on relevance score thresholds, rather than a fixed length, is more effective. This method accommodates the variability in the amount of relevant information per query, indicating that non-essential content should be dynamically removed.
+
+
+
+
+
+
+
+% \input{table/recomp}
+
+
+\paragraph{Effectiveness of Sentence-Level Re-ranking.} 
+
+\input{table/ablation}
+To assess the effectiveness of sentence-level re-ranking within our framework, we compared it to conventional passage-level re-ranking using the same context length in RAG, under an initial top-100 retrieval setting. Figure \ref{fig:effective} demonstrates that sentence-level re-ranking markedly outperforms passage-level re-ranking by enhancing performance through increased information density at a finer granularity. Additionally, while dense retrievers and fine-tuned ranking
+models demonstrate improvements as re-rankers, BM25 as a re-ranker significantly decreases the performance. This highlights the limitations of lexcial-based retrieval for assessing low-granularity, sentence-level relevance, underscoring the necessity for semantic understanding in sentence ranking tasks.
+Moreover, off-the-shelf ranking models, originally designed for passage-level relevance assessment, are also effective at determining relevance at the more granular level of individual sentences. Interestingly, even though it is not specifically trained for ranking tasks, the unsupervised re-ranker using LLMs shows remarkable performance in sentence-level re-ranking.
+
+% While we demonstrate the effectiveness of our \textit{DSLR} framework through improved RAG performance using the Accuracy, we further assess its impact with another metric, the Gold Answer Hit Rate, which measures the inclusion of gold answers within documents of context length \(L\). As shown in Figure \ref{fig:precision}, the Hit Rate improves with \textit{DSLR}. This indicates the effectiveness of our sentence-level strategy, which helps contain more correct answers compared to passage-level approaches by more accurately identifying query-relevant documents. Detailed results are provided in Appendix \ref{sec:hit_rate}.
+% we also analyze its effectiveness using Golden Answer Hit rate which is whehter golden answers are contain or not. Note that precision particularly measures the proportion of retrieved documents that are relevant to the query within the set of retrieved documents. As shown in Figure \ref{fig:precision}, precision also improves with our \textit{DSLR}, indicating the effectiveness of sentence-level strategy in containing more correctly predicted answers compared to passage-level strategies.
+
+
+
+%Figure \ref{fig:precision} shows the average proportion of passages containing the gold answer after re-ranking, excluding the ineffective BM25 (\textit{DSLR}) for both lengths \textit{L=100} and \textit{L=500}. Our analysis focuses on comparing passage-level re-ranking and \textit{DSLR}. The results indicate that our method not only enhances the accuracy in open-domain QA but also achieves higher document precision in the augmented generation compared to the passage-level re-ranking.
+
+
+
+% \noindent \textbf{Implications of Dense Initial Retrieval on \textit{DSLR} Performance}
+% This analysis examines the implications of using a dense initial retrieval approach for \(DSLR\) by investigating its performance across different scenarios. Table \ref{tab:dense} presents the reranking results using passages retrieved via DPR from the TQA dataset. Notable findings include modest performance gains at \(L=100\), which are not significantly superior to those achieved through initial retrieval with BM25, regardless of whether supervised or unsupervised rerankers are employed. At \(L=500\), the performance of \(DSLR\) is inconsistent, sometimes failing to improve or even deteriorating. This indicates that the performance gap between passage-level retrieval and \(DSLR\) narrows when the initial dense retrieval is sufficiently effective.
+
+% \noindent However, in practical settings, initial retrieval is typically performed using lightweight and fast sparse retrieval methods, such as BM25, due to their lower computational demands and faster processing times, especially when handling large corpora.
+
+
+
+\paragraph{Ablation Studies on the Sentence-Level Re-ranking and Reconstruction Steps.}
+%Table \ref{tab:ablation} presents the results of an ablation study on the NQ, TQA, and SQD datasets, examining the impact of removing sentence-level re-ranking (w/o SR). In this condition, passages are decomposed into sentences after initial retrieval (top-100) and used randomly as sources for generation. The average performance drops significantly from 53.5 to 29.8 without re-ranking, highlighting the crucial role of sentence-level re-ranking at both the passage and sentence levels. This decline suggests that not all sentences from the initial retrieval are sufficient for generating quality answers due to the presence of distractors. Additionally, the without Reconstruction (w/o RC) condition, where sentences are arranged in descending relevance score order or randomly instead of their original passage order, shows no performance improvement compared to passage-level re-ranking (52.4 vs. 52.2), emphasizing the importance of maintaining contextual integrity through reconstruction.
+To see how each step in \textit{DSLR} contributes to the overall performance, we conduct the ablation studies, the results shown in Table \ref{tab:ablation}, for the sentence-level re-ranking and reconstruction steps. These studies were uniquely tailored to the variable token counts reduced by \textit{DSLR}, rather than using a fixed length.
+
+First, we examine the impact of removing the sentence-level re-ranking step. In this scenario, after initially retrieving the top-1 passage, the results are decomposed into sentences. Subsequently, these sentences are randomly used as sources for generating answers. The performance drastically drops from 33.7 to 30.6 on the NQ, highlighting the crucial role of sentence-level re-ranking, which helps effectively filter out query-irrelevant information based on relevance scores.
+%This significant performance drop suggests that not all sentences from the initial retrieval are sufficient for generating accurate answers due to the presence of distracting information.
+
+
+Furthermore, we explore the effectiveness of the reconstruction step. The performance also drops from 64.1 to 63.8 on the TQA. This finding is similar to those from \citet{decontextualization}, which suggests that removing contextual coherence negatively affects the performance. Therefore, in \textit{DSLR}, reconstructing the order of sentences to reflect their original sequence within the retrieved passage is an essential step. Interestingly, the widely used approach of prepending external knowledge in descending order of relevance scores is not effective in our sentence-level refinement framework, showing similar results to a randomly ordered setting. 
+
+\input{table/case_study}
+
+\paragraph{Comparative Analysis of Document Refining methods: Evaluating RECOMP and \textit{DSLR}.} 
+%To compare recent advances in document refining, we conducted a comparative analysis between RECOMP \cite{recomp} and \textit{DSLR}. RECOMP aims to maximize performance with reduced context lengths but does not solely focus on eliminating unnecessary content, making a direct performance comparison not entirely appropriate. Nevertheless, RECOMP's extractive compressor, which utilizes the Contriever fine-tuned for specific datasets and language models, shares similarities with our method. For our comparison, we selected a two-sentence extraction context length following the RECOMP extractive setting.
+We further compare our \textit{DSLR} to the concurrent supervised refinement method, RECOMP \cite{recomp}, which requires additional training steps for refining the retrieved documents.
+To be specific, RECOMP is designed to refine the retrieved passages by either abstractively or extractively summarizing them with additional models.
+Note that due to significant differences between supervised and unsupervised schemes, directly comparing \textit{DSLR} with RECOMP on an apples-to-apples basis is difficult.
+However, to ensure as fair a comparison as possible, we evaluate both refining methods under the same conditions by adopting a two-sentence extraction context length, following the extractive setting used for RECOMP. 
+Additionally, RECOMP's extractive compressor, which requires Contriever to be fine-tuned on specific datasets, shares similarities with our \textit{DSLR} implementation that also uses Contriever, though ours is not additionally fine-tuned.
+%Figure \ref{fig:recomp} presents the results of this comparison. Overall, the in-domain trained RECOMP outperforms Contriever (\textit{DSLR}) across fine-tuned datasets. However, on the non-fine-tuned BASQ dataset, performance significantly declines from 54 to 47.9. This drop highlights the challenges of dataset-specific tuning and underscores the importance of developing more robust approaches.
+
+
+Figure \ref{fig:recomp} shows the results of the comparison between \textit{DSLR} and RECOMP in both in-domain and out-of-domain settings. While RECOMP shows robust performance on the in-domain datasets where it is particularly trained, its performance drops drastically for the out-of-domain settings, notably for BASQ from 54 to 47.9. This indicates the challenges of dataset-specific tuning for the supervised refinement methods. On the other hand, our \textit{DSLR} with RankT5 and RG shows robust performance even without additional training steps for refinement.
+%To be more specific, \textit{DSLR} with RankT5 and RG generally outperforms RECOMP models in our-domain settings, and it even sometimes outperforms RECOMP in in-domain settings. 
+
+
+%Furthermore, an abstractive RECOMP model fine-tuned for TQA outperformed one fine-tuned for NQ in evaluations on the NQ dataset when tested with the LLama2-13b chat model. This likely stems from better compatibility with the Flan-UL2 \cite{UL2} model-specific training. Additionally, a comparison between T5 models reveals that a T5-base model configured for RankT5 (\textit{DSLR}) exceeds the performance of a T5-large model tuned for RECOMP-TQA, scoring 46.7 versus 43.0 on average. This result indicates the potential limitations of language model-specific tuning strategies and points to the possibility that future refinement research might benefit from exploring fully unsupervised methods rather than task-specific or model-specific approaches.
+%Furthermore, an abstractive RECOMP model fine-tuned for TQA outperformed one fine-tuned for NQ in evaluations on the NQ dataset when tested with the LLama2-13b chat model. This likely stems from better compatibility with the Flan-UL2 \cite{UL2} model-specific training. Additionally, a comparison between T5 models reveals that a T5-base model configured for RankT5 (\textit{DSLR}) exceeds the performance of a T5-large model tuned for RECOMP-TQA, scoring 46.7 versus 43.0 on average. This result indicates the potential limitations of language model-specific tuning strategies and points to the possibility that future refinement research might benefit from exploring fully unsupervised methods rather than task-specific or model-specific approaches.
+
+\paragraph{Case Study.}
+We conduct a case study of the \textit{DSLR} framework in Table \ref{tab:case_study}. 
+%We compare \textit{DSLR} against conventional passage-level re-ranking, despite containing the correct answer "Pennsylvania," is compromised by distractors such as unrelated knowledge and irrelevant historical details about Flag Day parades (highlighted in red).
+Specifically, a conventional fixed-size passage may contain distractors, such as unrelated knowledge and irrelevant conceptual details about Nitrogen (highlighted in red).
+Note that, although the retrieved passage-level document includes `Oxygen', which is the correct answer to the given query, the LLM used as the reader fails to generate the accurate answer by being distracted by irrelevant information.
+%This redundant information distracts LLMs from accurately capturing the query-relevant such as Flag Day's status as a national holiday. 
+On the other hand, \textit{DSLR} effectively filters out such query-irrelevant sentences. Furthermore, \textit{DSLR} also helps focus on the information closely related to the query (highlighted in blue), thus correctly generating the answer.

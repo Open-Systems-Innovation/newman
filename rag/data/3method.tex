@@ -1,0 +1,205 @@
+\section{Method}
+
+
+
+% In this section, we first provide an overview of the RAG system, which typically utilizes coarse-grained passage-level retrieval and re-ranking. 
+% Next, we describe our method \(SLRR\) (Sentence-Level Reranking and Reconstruction), which does not require additional training and involves sentence-level ranking and reconstruction. 
+% Our method aims to enhance the precision of retrieval results, thereby facilitating the generation of accurate and reliable outputs.
+In this section, we describe a novel framework \textit{DSLR} for enhancing the precision of retrieval results through sentence-level ranking and reconstruction, integrated into the RAG system. Note that \textit{DSLR} does not require additional training.
+
+
+%, focusing on the augmentation of the existing RAG framework which is traditionally dependent on coarse-grained passage-level retrieval and re-ranking.
+% In this section, we first describe the overview of the RAG system, which usually exploits coarse-grained passage-level retrieval. 
+% Then, we describe our approach, not requiring any additional training, involving sentence-level ranking and reconstruction. 
+% Our approach is for enhancing the precision of retrieval results and subsequently generating accurate and reliable generation.
+
+\subsection{Preliminaries}
+\input{fig/method}
+We first introduce the general RAG system, which consists of three steps: the retrieval step, the re-ranking step, and the generation step.
+Note that all steps focus on passage-level documents.
+
+% We initiate by presenting preliminaries, introducing the concept of document reranking within the RAG framework. A RAG pipeline integrating reranking includes three fundamental stages.
+
+\subsubsection{Retrieval Step}
+\label{Retrieval Step}
+%Initially, a vast array $D$ of potentially relevant documents $d_i$ is retrieved from a corpus $C$ based on a given query $q$. This retrieval is traditionally performed using a keyword-based mechanism such as BM25. Formally, we define the retrieval function as:
+% Initially, let $D$ be a set of potentially relevant documents $d_i$  retrieved from a large corpus $C$ based on similarity to a given query $q$. 
+The retrieval step searches for a potentially relevant document set $\mathcal{D}$ to the given query $q$ from a retrieval corpus $\mathcal{C}$ consisting of millions of documents. 
+This retrieval step is conventionally performed using a sparse retriever $S$, such as BM25, which is widely used for processing large corpora due to its low latency. 
+The sparse retriever $S$ fetches the relevant documents having high relevant scores based on lexical values such as document length or unique word count.
+Formally, we define the retrieval step as:
+\[
+\mathcal{D} = \text{Retrieve}(q, \mathcal{C}; S) = \{d_1, d_2, ..., d_n\}
+\]
+where $d_k$ represents a document having the top-$k$ score among the retrieval corpus $\mathcal{C}$ for a given query $q$, and $n$ denotes the size of $\mathcal{D}$, generally ranging from tens to hundreds.
+% where $n$ represents a comprehensive initial set of candidate documents, typically on the range from tens to hundreds.
+
+% is typically ranges from tens to hundreds, ensuring a comprehensive initial set of candidate documents.
+% a more computationally-intensive method.
+\subsubsection{Re-ranking Step}\label{Re-ranking step}
+
+While the sparse retriever $S$ can efficiently handle a large corpus, it cannot consider semantic similarities, thereby limiting its retrieval performance for lexically different but semantically relevant pairs. 
+To address this, the re-ranking step aims for more precise retrieval results by reordering the retrieved document set $\mathcal{D}$ using the ranking model $R$. 
+This model transforms $\mathcal{D}$ into a newly ordered document set $\mathcal{D'}$ based on relevance scores with a query $q$, capturing semantic meanings that could not be addressed in the retrieval step with $S$.
+Formally, we define the re-ranking step as:
+\[
+\mathcal{D'}=\text{Re-rank}(q,\mathcal{D};R)=\{d'_1,\ldots,d'_m\}
+\]
+where $d'_k$ represents the document that has top-$k$ relevance score among $\mathcal{D}$ and \(m \ll n\), indicating that the subset $\mathcal{D'}$ contains significantly fewer documents than the original set $\mathcal{D}$.
+
+
+% In the next step, each retrieved document \(d_i\) undergoes a detailed analysis to determine how relevant it is to the query \(q\). 
+% This stage, called passage reranking, evaluates each document using more computationally-intensive approach. 
+% Here, \(S\) represents the scoring function that assigns a relevance score to each document based on its content in relation to the query.
+% We denote the scoring function by 
+% \(S\) and define the reranking process as:
+
+% The reranking process can be described by the following formula:
+
+% \[
+% S(d_i, q) \rightarrow \text{score}
+% \]
+
+
+% In the subsequent stage, each document $d_i$ retrieved is subjected to a more nuanced analysis to assess its relevance to the query $q$. This process, known as passage reranking, involves scoring each document leveraging computationally intensive methods. We denote the scoring function by $S$ and define the reranking process as:
+% \[
+% S(d_i, q) \rightarrow \text{score}
+% \]
+
+% Documents are then re-ranked based on these scores, refining the initial set to a more targeted subset, denoted as \(D'\):
+% \[
+% D'=\text{Rerank}(D, q)
+% \]
+% where \(D'\) is defined as \(\{d'_1, d'_2, \ldots, d'_m\}\) and \(m \ll n\), indicating that the subset \(D'\) contains significantly fewer documents than the original set \(D\), focusing on the most relevant documents for the query \(q\).
+
+% Each document is then re-ranked based on these scores, refining the initial set to a more targeted subset $D'$:
+% \[
+% D' = \text{Rerank}(D, q)
+% \]
+% where $D' = \{d'_1, d'_2, ..., d'_m\}$ and $m << n$.
+% $m$ is significantly smaller than $n$
+
+\subsubsection{Generation Step}
+\label{Generation Step}
+% The final stage of RAG involves leveraging the top-ranked documents \( D' \) to generate answers. This stage utilizes an advanced language model, which we denote as $LLM$. 
+After the re-ranking step, the document set $\mathcal{D'}$ is augmented to the LLM $M$ with the supporting documents to generate the correct answer $a$ for the given query $q$. The generation step can be formalized as:
+% The process of generating candidate answers can be formalized as follows:
+\[
+ a=\text{Generate}(q, \mathcal{D'}; M)
+\]
+% Here,  $LLM$ represents a model used to process the content of the top-ranked documents \( D' \). This model generates answers based on the contextual and factual content contained within \( D' \). The output is an answer \( a \). 
+% where \( a \) is the answer generated based on the contextual and factual content within \( D' \).
+
+% These are the three commonly used steps in RAG systems, which are carefully designed to fetch the most query-relevant knowledge for the LLM.
+% However, throughout these processes, including the re-ranking step, the retrieval unit remains fixed at the passage level, which poses limitations on considering the more fine-grained relevance between the query and individual sentences within the documents.
+% Since the knowledge required to answer a question is usually located in specific sentences rather than spread across entire documents, focusing on sentence-level relevance can help prevent the LLM from being distracted by irrelevant information, leading to more accurate answers.
+% Therefore, in this work, we aim to enhance the re-ranking step by introducing a fine-grained, sentence-level ranking strategy.
+In RAG systems, the three key steps are designed to retrieve the most query-relevant knowledge for LLMs, typically at the passage level. However, this fixed granularity can overlook finer relevance between queries and individual sentences.
+%, which is critical since the answer to a question often resides in specific sentences rather than entire documents. 
+Therefore, in this work, we introduce a fine-grained, sentence-level ranking strategy in the re-ranking step, aiming to reduce distractions from irrelevant information and enhance answer accuracy.
+% Suboptimally ranked documents may result in erroneous or irrelevant answers, compromising the performance of the entire RAG system. 
+% Consequently, we emphasize enhancing the re-ranking stage due to its significant effect on answer correctness.
+
+% The effectiveness of the reranking process is crucial as it directly influences the quality of documents fed into the answer generation module. 
+% Suboptimal-ranked documents may result in erroneous or irrelevant answers, compromising the performance of the entire RAG system. 
+% Consequently, we emphasize enhancing the reranking stage due to its significant effect on answer quality.
+
+% Therefore, our emphasis on augmenting the reranking stage is justified by its substantial influence on the overall answer quality.
+
+
+\subsection{Document Refinement with Sentence-Level Re-ranking and Reconstruction (DSLR)}
+
+We propose a novel unsupervised refinement framework, \textit{D}ocument Refinement with \textit{S}entence-\textit{L}evel \textit{R}e-ranking and Reconstruction (\textit{DSLR}), designed to assess the fine-grained relevance of individual sentences within a passage and reconstruct to preserve the original contextual coherence. 
+Figure \ref{fig:method} illustrates examples generated by each step in our \textit{DSLR} framework.
+
+
+% Our approach significantly refines the document reranking process by incorporating a novel sentence-level reranking and reconstruction phase. This phase is crucial for enhancing both the accuracy and contextual relevance of the retrieved documents. We detail the steps involved in this process and the rationale behind them.
+% To enhance both the accuracy and contextual relevance of the retrieved documents, we introduce a novel sentence-level reranking and reconstruction phase.
+
+\subsubsection{Sentence Decomposition and Re-ranking}
+After the retrieval step (§\ref{Retrieval Step}), we conduct sentence-level re-ranking for the documents within the retrieved set $\mathcal{D}$. First, each document $d_i \in \mathcal{D}$ is decomposed into a sentence set $\mathcal{S}_i = \{s_j\}_{j=1}^l$, where $s_j$ represents the $j$-th sentence in document $d_i$ and $l$ is the number of sentences in $d_i$. Then, the passage-level retrieved set $\mathcal{D}$ is redefined to the sentence-level retrieved set $\mathcal{S} = \cup_{i=1}^n \mathcal{S}_i$. For instance, as illustrated in Figure \ref{fig:method}, a passage retrieved for a query ``How many episodes in "Grace and Frankie" Season 1?" is decomposed into three sentences \( s_1 \), \( s_2 \), and \( s_3 \) during the sentence decomposition step.
+
+To extract sentences containing relevant information for a query \( q \), we initially perform re-ranking to assess relevance scores at the sentence level. Sentences in \( \mathcal{S} \) with scores below a predefined threshold \( T \) are deemed irrelevant and removed, resulting in a refined set \( \mathcal{S'} \). The sentence-level re-ranking is formally defined as follows:
+\[
+\mathcal{S'}=\text{Re-rank}(q,\mathcal{S};R)=\{s'_1,\ldots,s'_m\}
+\]
+where each $s'_k$ is a sentence from $\mathcal{S}$ whose relevance score exceeds $T$. Figure~\ref{fig:method} demonstrates the reordering of sentences, highlighting the exclusion of $s'_3$ due to its insufficient relevance score.
+%because it falls below a fixed length threshold, indicated by a red line, used in subsequent steps.
+Note that this step of the \textit{DSLR} framework utilizes off-the-shelf ranking models, which are identical to those used in passage-level re-ranking.
+% To maintain the contextual relevance of each sentence during analysis, the title of the original passage is appended to the beginning of each sentence.
+
+% each document \( d_i \) in the refined subset \( D \) undergoes a sentence-level analysis. We first decompose each document into its constituent sentences \( S = \{s_1, s_2, ..., s_k\} \). Each sentence is then scored for relevance to the query \( q \) using a document reranking model \( R \):
+
+% \[
+% R(s_j, q) \to \text{sentence\_score}_j
+% \]
+% To preserve the contextual integrity during sentence-level analysis, we prepend the title of the passage to each sentence. This aids in maintaining the sentence's contextual relevance within the broader document structure, ensuring that the evaluation of semantic properties is not divorced from the document's thematic essence.
+
+\subsubsection{Contextual Reconstruction}
+
+While the sentence decomposition and re-ranking steps select the top-$m$ relevant sentences for the query $q$, these sentences may lack contextual relationships to one another, as these steps can disrupt the original contextual flow of the passage by discarding some sentences.
+Instead of following a widely used approach of simply concatenating these sentences in descending order of their relevance scores, we propose to reconstruct them into the contextually organized set, $\mathcal{S}^*$, to reflect the order in which they were originally positioned before being decomposed from passages, ensuring the original coherence and logical flow:
+\[
+\mathcal{S}^* = \text{Reconstruction}(\mathcal{S'},\mathcal{S})=\{s^*_1,\ldots,s^*_m\}
+\]
+where $s^*_i$ is the sentence included in $S'$ and $i$ denotes the relative position of $s^*_i$ within $\mathcal{S}$. 
+As shown in Figure~\ref{fig:method}, the remaining two sentences are reconstructed in their original order by switching their positions to preserve the context before the sentence re-ranking step.
+Then, LLM $M$ generates the answer $a$ for a given query $q$ with $\mathcal{S}^*$ formalized as: $a=\text{Generate}(q,\mathcal{S}^*;M)$.
+
+
+% This methodology is designed to ensure that the reconstructed passages with top-scoring sentences maintain the original coherence and logical flow.
+%preserve the logical flow within each passage. By reinserting each sentence into the context from which it was initially extracted, we ensure that the reconstructed passage maintains the integrity and coherence of the original document structure.
+
+% \[
+% \mathcal{R}(S', d_i) \rightarrow \hat{d_i}
+% \]
+
+% where \(S' = \{s'_{1}, s'_{2}, ..., s'_{k}\}\) represents the top-scoring sentences, and \(\hat{d_i}\) is the reconstructed passage.
+% Let \( S' = \{s'_{1}, s'_{2}, ..., s'_{k}\} \) be the set of top-scoring sentences after reranking, where \( s'_{j} \) is a sentence originally located at position \( j \) in document \( d_i \). The reconstruction process \( \mathcal{R} \) is defined by:
+% where \( d_i \) is the original passage comprising sentences \( \{s_1, s_2, ..., s_n\} \), and \(\hat{d_i}\) is the reconstructed passage.
+% In \(\hat{d_i}\), each sentence \( s'_{j} \) is rearranged into its original position within \( d_i \).
+
+%where \( d_i \) is the original passage comprising sentences \( \{s_1, s_2, ..., s_n\} \). \(\hat{d_i}\) is the reconstructed passage.
+%Each sentence \( s'_{j} \) is reinserted into its original position within \( d_i \), ensuring that the narrative and logical flow of \( d_i \) is preserved as much as possible in \(\hat{d_i}\). %This approach maintains the structural and contextual integrity of the original passage, facilitating a coherent and comprehensible output that aligns with the user's query and the document's original context.
+
+% This integration ensures that the content provided to the LLM is of the highest relevance, thereby minimizing the common pitfalls of hallucination or irrelevance that can occur in less carefully curated inputs. By maintaining the structural and contextual integrity of the original texts within the reconstructed passages, our method not only enhances the precision of the retrieval process but also improves the accuracy of the answers generated by the RAG system.
+
+
+% \subsubsection{Integration with RAG Systems}
+
+% The reconstructed passages, denoted as \(\hat{D} = \{\hat{d_1}, \hat{d_2}, ..., \hat{d_m}\}\), are then used as inputs for the LLM in the answer generation step (§ \ref{Generation Step}):
+% \[
+% \text{LLM}(q, \hat{D}) \rightarrow a'
+% \]
+% where \( q \) is the user's query and \( a' \) is the generated answer. This integration leverages the enhanced contextual relevance and semantic precision of the reconstructed passages \( \hat{D} \), allowing the LLM to produce accurate responses.
+
+\input{table/main1}
+
+
+
+% \subsubsection{Integration with RAG Systems}
+% The reconstructed passages are then fed back into the RAG system, where they are utilized by the LLM for generating the final answer. This integration ensures that the LLM has access to the most relevant and contextually appropriate information, significantly enhancing the accuracy of the generated responses. By maintaining a high level of relevance and coherence in the information provided to the language model, our approach mitigates common issues such as hallucination and irrelevance, which are prevalent in responses generated from poorly ranked or incoherent passages.
+
+% The advantages of this refined reranking and reconstruction process are manifold. It not only improves the precision of the information retrieval but also enhances the overall user experience by providing responses that are both informative and contextually relevant. Furthermore, by dynamically reconstructing the passage according to the query's needs, our system adapts more effectively to varied and complex query types, demonstrating superior performance across diverse datasets and query scenarios.
+
+
+% \subsubsection{Integration with RAG Systems}
+
+% The reconstructed passages are then fed back into the RAG system, where they are utilized by the LLM for generating the final answer. In this stage, the reconstructed passages \( \hat{d_i} \) are utilized as the final input to the RAG system for answer generation. This process can be formalized as follows:
+
+% \[
+% \text{LLM}(q, \hat{D}) \rightarrow a'
+% \]
+
+% Here, \( \hat{D} = \{\hat{d_1}, \hat{d_2}, ..., \hat{d_m}\} \) represents the set of reconstructed passages, where each \( \hat{d_i} \) is derived from the corresponding original document \( d_i \) using the reconstruction process \( \mathcal{R} \). The function \( \text{LLM} \) denotes the retrieval-augmented answer generation mechanism of the RAG system, which combines the capabilities of large language models with external information retrieved and refined through our novel approach. processes the input query \( q \) in conjunction with the refined set of passages \( \hat{D} \) to produce a final answer \( a \)
+
+% Here, \( \hat{D} = \{\hat{d_1}, \hat{d_2}, ..., \hat{d_m}\} \) denotes the collection of reconstructed passages. Each reconstructed passage \( \hat{d_i} \) originates from the corresponding original document \( d_i \) and is crafted through the reconstruction process \( \mathcal{R} \). This meticulous process ensures that each passage not only maintains the integrity of its source content but also aligns more precisely with the query's requirements.
+
+% The function \( \text{LLM} \) within our RAG framework represents the retrieval-augmented answer generation mechanism, which expertly marries the capabilities of large language models with the contextually enriched and semantically refined information from \( \hat{D} \). During the answer generation phase, the RAG system processes the input query \( q \) alongside \( \hat{D} \), leveraging this integration to synthesize a final answer \( a \). This approach ensures that the generated responses are not only accurate but also deeply grounded in the context provided by the reconstructed passages, thereby significantly enhancing both the relevance and reliability of the output.
+
+% During the answer generation phase, the RAG system leverages both the semantic richness of the reconstructed passages and the contextual cues retained from the original documents. This dual reliance ensures that the answers generated are not only accurate but also deeply grounded in the factual content of the source material. The large language model component of the RAG system, typically a transformer-based model, processes the input query \( q \) in conjunction with the refined set of passages \( \hat{D} \) to produce a final answer \( a \), which is expected to be contextually relevant and informationally robust:
+
+% \[
+% LLM(q, \hat{D}) \rightarrow a
+% \]
+

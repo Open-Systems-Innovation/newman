@@ -1,0 +1,62 @@
+Chunk 1:
+Recent advancements in Large Language Models (LLMs)  have significantly expanded their capabilities across diverse knowledge-intensive tasks in Natural Language Processing (NLP), such as Question Answering (QA) . 
+However, despite these capabilities, LLMs still face challenges such as generating plausible yet non-factual responses, known as hallucination, due to their reliance on limited parametric memory . 
+Also, it is noted that this parametric memory is static, as LLMs can learn knowledge only up to the specific date on which the training was completed.
+Therefore, these limitations restrict their adaptability to long-tailed or ever-evolving domains  and to unseen knowledge outside their training data .
+
+==================================================
+
+Chunk 2:
+ility to long-tailed or ever-evolving domains  and to unseen knowledge outside their training data .Retrieval-Augmented Generation (RAG)  has been introduced as an effective solution to address such problems.
+Specifically, RAG enhances LLMs by integrating non-parametric memories fetched from external knowledge bases using a retrieval module, which helps LLMs' responses grounded on factual evidence and makes them more up-to-date.
+
+==================================================
+
+Chunk 3:
+val module, which helps LLMs' responses grounded on factual evidence and makes them more up-to-date.While the efficacy of RAG depends on the performance of the retrieval module, the instability of LLMs in incorporating the retrieved knowledge is also a critical challenge to RAG.
+To be specific, retrieved documents sometimes contain irrelevant information~, and LLMs often struggle to effectively filter out such redundant details and focus on the most query-relevant knowledge~, which leads to the failure of the overall RAG systems.
+Therefore, it is crucial to investigate how to effectively refine retrieved documents before augmenting them with LLMs, ensuring that the LLMs are not distracted by irrelevant information within retrieved documents.
+
+Re-ranking the order of the retrieved document set~ or refining them into new documents~ can be considered as solutions.
+
+However, they generally require high computational costs for training additional re-ranking or refining models.
+
+==================================================
+
+Chunk 4:
+ey generally require high computational costs for training additional re-ranking or refining models.Another proposed solution is to reduce the retrieval granularity from passage-level to sentence-level which can help eliminate redundant information within passages .
+However, this might also inadvertently remove important contextual information, which is crucial for accurately answering the given queries .
+Therefore, we should explore a novel method that can effectively and efficiently filter out irrelevant information while maintaining the necessary contextual details.
+
+In this work, we introduce an unsupervised } (ocument Refinement with entence-evel e-ranking and Reconstruction) framework that consists of three steps: 1) decomposition, 2) re-ranking, and 3) reconstruction.
+
+==================================================
+
+Chunk 5:
+ion) framework that consists of three steps: 1) decomposition, 2) re-ranking, and 3) reconstruction.Specifically, after retrieving the passage-level document, the  framework operates by first decomposing the retrieved document into sentences for finer granularity and then filtering out the irrelevant sentences based on their re-ranking scores from the ranking models, including off-the-shelf retrievers and re-rankers. 
+Finally, the remaining sentences are reconstructed into a single document to preserve the original contextual information. 
+Note that  is an unsupervised refinement framework, which does not require any additional training for re-ranking or reconstruction steps.
+The overall  framework is illustrated in Figure~.
+
+==================================================
+
+Chunk 6:
+l training for re-ranking or reconstruction steps.
+The overall  framework is illustrated in Figure~.We validate our framework across a diverse range of open-domain QA benchmarks, which include three general QA datasets and three specific QA datasets that require domain-specific or ever-evolving knowledge.
+Our experimental results show that  significantly enhances the overall RAG performance and is comparable to, or even outperforms, the supervised baseline approaches.
+Specifically, when evaluated with specific QA datasets,  shows high robustness in realistic settings.
+Furthermore, a detailed analysis demonstrates the effectiveness of each proposed step and how it contributes to the overall performance.
+
+Our contributions in this work are threefold:
+
+We point out that recent RAG systems are largely vulnerable to redundant knowledge within fixed-size passage-level retrieved documents and that the existing refining strategies generally require additional training steps.
+
+==================================================
+
+Chunk 7:
+ved documents and that the existing refining strategies generally require additional training steps.We propose a  framework that incorporates sentence-level re-ranking and reconstruction to effectively remove redundant knowledge that negatively affects the RAG system.
+
+We show that  is highly effective and efficient even without additional training steps in both general and specific scenarios.
+
+==================================================
+

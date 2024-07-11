@@ -1,0 +1,44 @@
+What is the best way to augment the prompt using RAG?
+
+Chunk 83:
+In this section, we describe a novel framework  for enhancing the precision of retrieval results through sentence-level ranking and reconstruction, integrated into the RAG system. Note that  does not require additional training.
+
+We first introduce the general RAG system, which consists of three steps: the retrieval step, the re-ranking step, and the generation step.
+Note that all steps focus on passage-level documents. Chunk 12:
+remainder of this section, we present our insights and learnings for addressing RAG control points.In figure~, we present a summary description of the fifteen control points of RAG pipelines, challenges associated with each control point, and our suggested approaches for optimizing each control point. Each control point is labeled as RAG-C[num] and RAG-Op[num] for RAG and RAGOps flows, respectively. Below, we present a few key learnings and insights to manage the fresh enterprise content. Chunk 19:
+necessary automation to enable rapid iteration during accuracy improvement cycles in RAG pipelines.More details on each control point are presented in Figure~. In summary, while promising, implementing RAG systems for chatbots demands meticulous planning and continuous evaluation to ensure secure and accurate data retrieval.
+
+[t]
+
+[t]
+
+[h]
+
+Keeping up with rapid progress in AI is like navigating a fast-moving river. Every aspect, from vector databases and embedding models to LLMs, agentic architectures, low-code/no-code platforms, RAG evaluation frameworks, and prompting techniques, is evolving rapidly. Concurrently, departments within companies are exploring generative AI by building their own chatbots and AI copilots. Chunk 99:
+ved documents and that the existing refining strategies generally require additional training steps.We propose a  framework that incorporates sentence-level re-ranking and reconstruction to effectively remove redundant knowledge that negatively affects the RAG system.
+
+We show that  is highly effective and efficient even without additional training steps in both general and specific scenarios. Chunk 37:
+tion and hypothetical answer. This is a promising approach  but might make the architecture complex.Active Retrieval augmented generation (FLARE)~ iteratively synthesizes a hypothetical next sentence. If the generated sentence  contains low-probability tokens,  FLARE would use the sentence as the new query for retrieval and regenerate the sentence. Mialon~~ reviews works for advanced augmented generation methods in language model. Self-refine  builds an agent to improve the initial answer of RAG through iterative feedback and refinement. ReAct~ Agent is widely used for handling the complex queries in a recursive manner.  On the RAG evaluation front, RAGAS~ and ARES~ utilize LLMs as judges and build automatic RAG benchmark to evaluate the RAG system.  Zhu~~ overview the intensive usages of LLM in a RAG pipeline including retriever, data generation, rewriter, and reader. We believe that our work provides a unique perspective on building secure enterprise-grade chatbots via our FACTS framework. Chunk 133:
+question, but it can also introduce bias, leading to performance degradation instead of improvement.The difference between the relationship between context relevancy and performance in open-form and closed-form questions suggests that the RAG is highly application-dependent. For example, the strategy for context retrieval for open-form applications should be different from the strategy used in closed-form applications. It is also important to be mindful when evaluating RAG, as common closed-form benchmarks might not be good indicators of RAG's performance in open-form applications.
+    When designing an RAG, especially in open-form applications, it is important to include some other factors than pure embedding distance or relevancy. Sometimes including a piece of context that is not as close in embedding distance to the question might be helpful as it does not reinforce the hidden bias inside the question.
+
+*{Data and Code Availability} Chunk 169:
+ge-level documents and then reconstructing the re-ranked sentences to preserve contextual integrity.RAG has emerged as a promising solution for addressing LLMs' hallucination issues by leveraging external knowledge fetched by the retrieval module. 
+Specifically, RAG incorporates retrieval modules that reduce the need to update the parameters of LLMs and help them generate accurate and reliable responses~.
+
+Additionally, various real-world applications integrate RAG as a core component when deploying LLM-based services~. 
+However, they still have limitations due to the imperfections of the retrieval module within RAG, where the retrieved documents containing query-irrelevant information can negatively lead the LLMs to generate inaccurate answers. Chunk 108:
+ntext of the RAG systems, future research directions, and other methods that enhance LLM performanceLLMs have shown remarkable capabilities in various tasks, including code generation , text summarization , and database query optimization . They demonstrate a surprising ability to perform in-context learning, where an LLM ``learns'' to do a task simply by conditioning on a prompt containing input-output examples, achieving state-of-the-art (SOTA) results on various benchmarks. However, there has been little understanding of how the model leverages the context and what makes in-context learning work.
+    In addition, their performance significantly depends on the contextual information provided and, as discussed in this paper, on the form and type of the queries. Chunk 104:
+low LLMs to leverage new pieces of information that were not a part of the initial training corpus .One approach to the issue might be in-context learning , where LLMs effectively learn to solve a given problem leveraging a limited number of examples without updating the model parameters. Namely, in-context learning incorporates question-solution pairs in the input prompt, allowing LLMs to detect the logic and patterns of those examples, subsequently improving the LLMs output accuracy. It enables LLMs to acquire new knowledge in the inference time and utilize it in subsequent responses. This technique significantly reduces the complexity of improving the LLMs performance compared to alternative approaches such as fine-tuning . 
+    It should also be noted that the effectiveness of the popular Retrieval-Augmented Generation (RAG) techniques relies heavily on the strength of in-context learning    , as discussed later. Chunk 30:
+tools to make this automated is critical to pos-production life cycle management of these chatbots.: Effective testing of RAG-based chatbots requires anticipation of lengthy test cycles. Begin by focusing on automating tests and enhancing accuracy assessments to streamline this essential phase.
+
+{}: It is crucial to construct comprehensive ground truth datasets that reflect full spectrum of targeted solution strengths. This ensures that the chatbot is tested against scenarios that it will encounter in actual use.
+
+}: While leveraging LLMs as evaluators can provide scalable testing options, remember that the quality of human evaluations is unmatched. Automated tools should be used where feasible to supplement but not replace human oversight.
+
+{}: Establish mechanisms that allow for  human feedback and systematic error analysis. Prioritize iterative improvements based on this feedback to continually refine chatbot performance and adaptability.
+
+{Securing RAG-based Chatbots (S)}
+
