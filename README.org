@@ -1,0 +1,4 @@
+#+TITLE: Newman
+An open source, local, AI assistant.
+* RAG (Retrieval Augmented Generation)
+Uses the LaTeX papers stored in ~/data~ to augment the LLM response based on the prompt in ~retrieval.py~. Papers can be downloaded for free from [[https://arxiv.org/][arXiv]]. 
