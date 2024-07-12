@@ -1,0 +1,98 @@
+Chunk 1:
+In this section, we show the overall experimental results with in-depth analyses of our framework.
+
+First of all, Table  shows that our -refined top-1 document consistently outperforms the original top-1 document across all datasets and scenarios, despite reduced token counts. This confirms our hypothesis that the redundant information within the fix-sized passages adversely affects the RAG performance and highlights the importance of providing only query-relevant information in RAG with finer-grained sentences.
+
+==================================================
+
+Chunk 2:
+hts the importance of providing only query-relevant information in RAG with finer-grained sentences.Furthermore,  also shows performance enhancement over specialized datasets, such as ever-evolving RQA and domain-specific SQ and BASQ datasets.
+Specifically, the re-rankers based on pre-trained models such as T5 and the LLM demonstrate remarkable performance improvement.
+Given that  requires no additional training, the robust and effective performance suggests its applicability to diverse real-world scenarios, particularly where queries frequently change across different timelines and domains.
+
+in Multiple Passages.}
+To assess the effectiveness and efficiency of  in multiple passages, we gradually increased the number of documents \(N\) and compared the performance, token count, and end-to-end (E2E) latency of the original top-\(N\) documents with those refined by .
+
+==================================================
+
+Chunk 3:
+oken count, and end-to-end (E2E) latency of the original top-\(N\) documents with those refined by .As shown in the left panel of Figure , both sets of documents show consistent performance improvements as \(N\) increases. However,  consistently outperforms the original documents across all \(N\) levels, with more notable differences at lower \(N\) values. This suggests that  can significantly enhance performance in RAG, even as the number of documents increases.
+
+==================================================
+
+Chunk 4:
+gests that  can significantly enhance performance in RAG, even as the number of documents increases.Due to the quadratic increase in memory and time requirements with the number of tokens in transformer-based LLMs, reducing the token count is crucial for improving efficiency . As depicted in the center and right panels of Figure ,  substantially reduces the token count compared to the original documents, with the difference becoming more significant as \(N\) increases. This reduction in tokens also decreases E2E latency in all scenarios except top-1. Notably, at top-10, while the performance difference is minimal (39.6 vs. 39.7), the token count reduction from 1,713 to 577 (nearly 2.97 times) and the corresponding E2E latency reduction from 7.382 seconds to 5.422 seconds (nearly 2 seconds) demonstrate that  can enhance both performance and efficiency in RAG. Detailed results are available in Table .
+
+==================================================
+
+Chunk 5:
+that  can enhance both performance and efficiency in RAG. Detailed results are available in Table .To examine the impact of varying \( T \), we adjusted the threshold in increments of 10, starting from the 10th percentile, and measured the resulting performance. Additionally, to explore the theoretical maximum performance of our method, we configured an oracle setting where any correct response, regardless of the threshold setting, was counted as correct.
+
+As shown in Figure , increasing the threshold \( T \) generally improves performance by removing irrelevant content, thus reducing the number of tokens. However, our experimental results revealed that the performance at the 90th percentile threshold was 29.4, while a lower 80th percentile threshold yielded better performance at 29.9. This indicates that an overly stringent threshold can also remove essential information, suggesting that task-specific threshold fine-tuning could improve results.
+
+==================================================
+
+Chunk 6:
+ve essential information, suggesting that task-specific threshold fine-tuning could improve results.Furthermore, in the oracle setting, accuracy significantly improved to 34.1, and the token count was reduced to 77. This shows a marked performance improvement over the best performing threshold (80th percentile), with a similar reduction in tokens. This result implies that dynamically adjusting the threshold based on the query could achieve substantial performance improvements with a comparable number of tokens, suggesting an area for future work. Detailed results are available in Table .
+
+==================================================
+
+Chunk 7:
+able number of tokens, suggesting an area for future work. Detailed results are available in Table .The left panel of Figure  displays the distribution of token counts in documents refined by . Unlike methods that trim passages to a fixed length,  reduces token counts based on a relevance score threshold, resulting in a wide distribution of token counts, with many instances nearly devoid of external knowledge. The average token count post-refinement is 46. We analyzed performance by comparing this approach with cases where passages are consistently cut to 46 tokens: one where passages are simply truncated at 46 tokens, another using sentence-level re-ranking to select the most relevant sentences up to 46 tokens, and a third where sentences are randomly cut to 46 tokens.
+
+==================================================
+
+Chunk 8:
+most relevant sentences up to 46 tokens, and a third where sentences are randomly cut to 46 tokens.As demonstrated in the right panel of Figure , , which trims content based on relevance, significantly outperforms methods that trim to a fixed length, improving scores from 25.3 to 33.7. This suggests that trimming based on relevance score thresholds, rather than a fixed length, is more effective. This method accommodates the variability in the amount of relevant information per query, indicating that non-essential content should be dynamically removed.
+
+==================================================
+
+Chunk 9:
+relevant information per query, indicating that non-essential content should be dynamically removed.To assess the effectiveness of sentence-level re-ranking within our framework, we compared it to conventional passage-level re-ranking using the same context length in RAG, under an initial top-100 retrieval setting. Figure  demonstrates that sentence-level re-ranking markedly outperforms passage-level re-ranking by enhancing performance through increased information density at a finer granularity. Additionally, while dense retrievers and fine-tuned ranking
+models demonstrate improvements as re-rankers, BM25 as a re-ranker significantly decreases the performance. This highlights the limitations of lexcial-based retrieval for assessing low-granularity, sentence-level relevance, underscoring the necessity for semantic understanding in sentence ranking tasks.
+Moreover, off-the-shelf ranking models, originally designed for passage-level relevance assessment, are also effective at determining relevance at the more granular level of individual sentences. Interestingly, even though it is not specifically trained for ranking tasks, the unsupervised re-ranker using LLMs shows remarkable performance in sentence-level re-ranking.
+
+==================================================
+
+Chunk 10:
+ks, the unsupervised re-ranker using LLMs shows remarkable performance in sentence-level re-ranking.To see how each step in  contributes to the overall performance, we conduct the ablation studies, the results shown in Table , for the sentence-level re-ranking and reconstruction steps. These studies were uniquely tailored to the variable token counts reduced by , rather than using a fixed length.
+
+First, we examine the impact of removing the sentence-level re-ranking step. In this scenario, after initially retrieving the top-1 passage, the results are decomposed into sentences. Subsequently, these sentences are randomly used as sources for generating answers. The performance drastically drops from 33.7 to 30.6 on the NQ, highlighting the crucial role of sentence-level re-ranking, which helps effectively filter out query-irrelevant information based on relevance scores.
+
+==================================================
+
+Chunk 11:
+-ranking, which helps effectively filter out query-irrelevant information based on relevance scores.Furthermore, we explore the effectiveness of the reconstruction step. The performance also drops from 64.1 to 63.8 on the TQA. This finding is similar to those from , which suggests that removing contextual coherence negatively affects the performance. Therefore, in , reconstructing the order of sentences to reflect their original sequence within the retrieved passage is an essential step. Interestingly, the widely used approach of prepending external knowledge in descending order of relevance scores is not effective in our sentence-level refinement framework, showing similar results to a randomly ordered setting.
+
+.}
+
+==================================================
+
+Chunk 12:
+our sentence-level refinement framework, showing similar results to a randomly ordered setting.
+
+.}We further compare our  to the concurrent supervised refinement method, RECOMP , which requires additional training steps for refining the retrieved documents.
+To be specific, RECOMP is designed to refine the retrieved passages by either abstractively or extractively summarizing them with additional models.
+Note that due to significant differences between supervised and unsupervised schemes, directly comparing  with RECOMP on an apples-to-apples basis is difficult.
+However, to ensure as fair a comparison as possible, we evaluate both refining methods under the same conditions by adopting a two-sentence extraction context length, following the extractive setting used for RECOMP. 
+Additionally, RECOMP's extractive compressor, which requires Contriever to be fine-tuned on specific datasets, shares similarities with our  implementation that also uses Contriever, though ours is not additionally fine-tuned.
+
+==================================================
+
+Chunk 13:
+ties with our  implementation that also uses Contriever, though ours is not additionally fine-tuned.Figure  shows the results of the comparison between  and RECOMP in both in-domain and out-of-domain settings. While RECOMP shows robust performance on the in-domain datasets where it is particularly trained, its performance drops drastically for the out-of-domain settings, notably for BASQ from 54 to 47.9. This indicates the challenges of dataset-specific tuning for the supervised refinement methods. On the other hand, our  with RankT5 and RG shows robust performance even without additional training steps for refinement.
+
+We conduct a case study of the  framework in Table .
+
+==================================================
+
+Chunk 14:
+hout additional training steps for refinement.
+
+We conduct a case study of the  framework in Table .Specifically, a conventional fixed-size passage may contain distractors, such as unrelated knowledge and irrelevant conceptual details about Nitrogen (highlighted in red).
+Note that, although the retrieved passage-level document includes `Oxygen', which is the correct answer to the given query, the LLM used as the reader fails to generate the accurate answer by being distracted by irrelevant information.
+
+On the other hand,  effectively filters out such query-irrelevant sentences. Furthermore,  also helps focus on the information closely related to the query (highlighted in blue), thus correctly generating the answer.
+
+==================================================
+

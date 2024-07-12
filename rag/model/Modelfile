@@ -1,9 +1,0 @@
-FROM llama3
-
-# set the temperature [higher is more creative, lower is more coherent]
-PARAMETER temperature 0.5
-
-# set the system message
-SYSTEM """
-You are an assistant to a PhD researcher. Your job is to use the relevant information, combined with your own knowledge, to form an insightful answer to the question.
-"""

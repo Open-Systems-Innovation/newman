@@ -1,5 +1,41 @@
-* Retrieval Augmented Generation (RAG)
+#+title: Retrieval Augmented Generation (RAG)
+
 The goal of this directory is to assist the user in solving a research problem by using LLMs to help quickly find and explain information stored in a curated database of scholarly articles. It provides an interface where the user can create a database of LaTex files from scholarly articles about a specific subject, and then ask a question to an LLM about that subject matter. The response will be augmented by the articles in the database. These articles will also be referenced in the response. 
 
+
+To use this, first you must have a question that you want to answer, and you must think that your search would benifit by a deep dive into the related scholarly literature. To achieve this goal, this repo requires the user to take the following steps:
+
+- Carefully curate a *database* of LaTex files of scholarly articles.
+- Once you've curated the database, you need to *chunk* up the documents in it to create chunks of text.
+  These chunks will be encoded and *embedded* into a high dimensional vector space based on their semantic structure.
+- Later, when we ask the LLM a question, we will also embed the question into the vector space, and *retrieve* the ~k~ chunks that best match the semantic structure of the question.
+- Finally, we can add those chunks to the prompt and *generate a response* with our new, augmented prompt.
+
 * Building the database
-The database is just a folder in the current directory called ~data~. In this folder you should put ~.tex~ files of scholarly articles about the problem you are trying to solve. The best source of LaTeX articles is on [[https://arxiv.org][arxiv.org]]. All you have to do is download articles and put the ~.tex~ files in the ~data~ folder. 
+The database is just a folder in the current directory called ~data~. In this folder you should put ~.tex~ files of scholarly articles about the problem you are trying to solve. The best source of LaTeX articles is on [[https://arxiv.org][arxiv.org]]. All you have to do is download articles and put the ~.tex~ files in the ~data~ folder.
+
+* Processing the Latex Files
+This is done automatically by the ~latex_processor.py~ file. In this fiile there is a ~LatexProcessor~ class that does the following:
+- 
+
+* Creating text chunks
+Now we have to take those ~.tex~ files, parse them to remove any unwanted information (like LaTex headers, meta information, etc), and turn them in "chunks" that can later be retrieved for augmented response generation. This is done by the ~chunking.py~ file in this repo.
+
+This file creates a ~LatexChunker~ class that has a ~process_tex_files()~ function that does the following:
+- first, process the ~.tex~ files and remove any
+- 
+
+* Embedding the chunks
+
+
+* Retrieving similar chunks
+- Embed the prompt
+- Query the database with the embedded prompt to find ~k~ similar results
+- 
+
+* Generating a response
+
+
+* TODO
+- Reranking
+- Context construction

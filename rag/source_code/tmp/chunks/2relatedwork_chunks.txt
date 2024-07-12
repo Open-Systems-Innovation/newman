@@ -1,0 +1,42 @@
+Chunk 1:
+Information Retrieval (IR) is the task of searching for query-relevant documents from a large corpus , which has been widely applied for both search systems and various NLP tasks such as open-domain QA ~.
+
+IR models can be categorized into sparse retrievers , which use lexical metrics to calculate relevance scores between queries and documents, and dense retrievers , which embed queries and documents into a dense space that captures semantic relationships but requires significant computational resources .
+
+In order to further enhance retrieval performance, additional strategies have been proposed.
+Specifically, the re-ranking strategy improves retrieval performance by recalculating relevance scores using an additional re-ranking model , and then reordering the documents based on these scores.
+Recently, LLMs have shown remarkable re-ranking performance by generating relevance labels without requiring further fine-tuning .
+
+==================================================
+
+Chunk 2:
+rkable re-ranking performance by generating relevance labels without requiring further fine-tuning .While the aforementioned work on IR  generally assumes fixed-size, 100-word passages as the document length, some work has explored an optimal level of retrieval granularity~.
+These approaches validate that a fine-grained level of granularity, containing only the knowledge needed to answer the query, can enhance the overall performance by excluding redundant details in the lengthy retrieved documents. 
+However, reducing retrieval granularity to the sentence level can disrupt the original context and result in a loss of the document’s coherence .
+In addition, sentence-level retrieval generally requires a much larger index size compared to passage-level retrieval .
+By contrast, we investigate a novel framework for effectively re-ranking sentences within retrieved passage-level documents and then reconstructing the re-ranked sentences to preserve contextual integrity.
+
+==================================================
+
+Chunk 3:
+ge-level documents and then reconstructing the re-ranked sentences to preserve contextual integrity.RAG has emerged as a promising solution for addressing LLMs' hallucination issues by leveraging external knowledge fetched by the retrieval module. 
+Specifically, RAG incorporates retrieval modules that reduce the need to update the parameters of LLMs and help them generate accurate and reliable responses~.
+
+Additionally, various real-world applications integrate RAG as a core component when deploying LLM-based services~. 
+However, they still have limitations due to the imperfections of the retrieval module within RAG, where the retrieved documents containing query-irrelevant information can negatively lead the LLMs to generate inaccurate answers.
+
+==================================================
+
+Chunk 4:
+containing query-irrelevant information can negatively lead the LLMs to generate inaccurate answers.To address them, several studies have attempted to leverage the capabilities of LLMs to enhance their resilience against irrelevant knowledge. 
+These approaches include crafting specialized prompts~, training plug-in knowledge verification models~, adaptively retrieving the required knowledge~, and augmenting knowledge using the capabilities of the LLM itself .
+
+==================================================
+
+Chunk 5:
+rieving the required knowledge~, and augmenting knowledge using the capabilities of the LLM itself .Among the promising solutions, recent studies show that further refining the retrieved documents into fine-grained knowledge can improve the RAG performance~.
+However, such refinement strategies generally require additional fine-tuning on a specific dataset, which might result in limited generalizability and high computational cost. 
+By contrast, our proposed refinement framework removes irrelevant information with unsupervised sentence-level re-ranking and reconstruction steps by using off-the-shelf ranking models without requiring additional training costs.
+
+==================================================
+

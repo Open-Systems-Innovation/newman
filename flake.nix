@@ -26,23 +26,17 @@
               # pkgs.clangd
               #  # Python packages
               (pkgs.python3.withPackages (python-pkgs: [
-              #  # packages for formatting/ IDE
-                python-pkgs.llama-index-core
-                python-pkgs.llama-index-embeddings-huggingface
-                python-pkgs.llama-index-llms-ollama
-                python-pkgs.llama-index-readers-file
-                #python-pkgs.llama-index-llms-huggingface
-                python-pkgs.langchain
+                python-pkgs.python-lsp-server
+               # python-pkgs.llama-index-core
+               # python-pkgs.llama-index-embeddings-huggingface
+               # python-pkgs.llama-index-llms-ollama
+               # python-pkgs.llama-index-readers-file
+               # python-pkgs.langchain
                 python-pkgs.faiss
                 python-pkgs.ollama
-              #  python-pkgs.pip
-              #  python-pkgs.python-lsp-server
-              #  # packages for code
-              #  python-pkgs.gmsh
-              #  python-pkgs.matplotlib
-              #  python-pkgs.meshio
-              #  python-pkgs.numpy
-              #  python-pkgs.firedrake
+                python-pkgs.pylatexenc # to parase the LaTeX documents in RAG
+                python-pkgs.chromadb  # the embedding database
+                python-pkgs.sentence-transformers
               ]))
             ];
 
