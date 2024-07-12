@@ -1,0 +1,5 @@
+* Retrieval Augmented Generation (RAG)
+The goal of this directory is to assist the user in solving a research problem by using LLMs to help quickly find and explain information stored in a curated database of scholarly articles. It provides an interface where the user can create a database of LaTex files from scholarly articles about a specific subject, and then ask a question to an LLM about that subject matter. The response will be augmented by the articles in the database. These articles will also be referenced in the response. 
+
+* Building the database
+The database is just a folder in the current directory called ~data~. In this folder you should put ~.tex~ files of scholarly articles about the problem you are trying to solve. The best source of LaTeX articles is on [[https://arxiv.org][arxiv.org]]. All you have to do is download articles and put the ~.tex~ files in the ~data~ folder. 

@@ -1,4 +1,4 @@
-What is the best way to augment the prompt using RAG?
+What is the best way to augmentabout a specific subjecabout a specific subjec the prompt using RAG?
 
 Chunk 83:
 In this section, we describe a novel framework  for enhancing the precision of retrieval results through sentence-level ranking and reconstruction, integrated into the RAG system. Note that  does not require additional training.
