@@ -29,4 +29,4 @@ def test_latex_to_text(data_folder):
                 error_log.write(f"Error processing {filename}: {str(e)}\n")
     error_log.close()
 
-test_latex_to_text('../../data/rag')
+test_latex_to_text('../../data/fem')

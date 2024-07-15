@@ -1,0 +1,480 @@
+tikzmark
+patterns, calc
+positioning,matrix,fit
+shapes,arrows
+decorations.pathreplacing,angles,quotes
+shapes.geometric, arrows
+ decorations.pathmorphing
+==================================================
+Higher Order Implicit Discretization of Maxwell's Equations]An Energy Conserving, Implicit and Higher Order in Time Discretization of Maxwell's Equations
+==================================================
+Department of Mathematics, Indraprastha Institute of Information Technology, Delhi, New Delhi, 110020, India
+archanaa@iiitd.ac.in, kaushik@iiitd.ac.in
+==================================================
+This is a sequel to our earlier work in which we described an implicit leapfrog scheme in conjunction with a higher order mixed finite element discretization of a system of Maxwell's equations. In our earlier work, we focussed on providing the error analysis for both the semidiscretization of the Maxwell's equations using an implicit leapfrog scheme that we invented as well as providing the error analysis for the full discretization using this time domain scheme in conjunction with higher order mixed finite elements from finite element exterior calculus. In this work, we record our initial results with extending our implicit leapfrog scheme from being a discretization that is second order accurate in time to an arbitrary (even) order accurate in time method. Towards this end, we provide here the complete error analysis for the semidiscretization in time and full discretization of the Maxwell's equations for the fourth order scheme. We leave the completion of our efforts in providing all the necessary proofs for the general scheme to an immediate future update of this work.
+==================================================
+[
+    Archana Arya and Kaushik Kalyanaraman
+    July 14, 2024
+=========================================
+==================================================
+Our main contribution in this work is in coming up with a generalization of our implicit leapfrog scheme in our previous work <cit.> to an arbitrary (even) order method for the time discretization which we refer to as the LF_R discretization. Our methodology is inspired and grounded in a similar LF_N scheme described by Fahs in <cit.>. In their work, Fahs and coauthors were providing their higher order (in time) explicit leapfrog scheme for the discretization of Maxwell's equation using discontinuous Galerkin methods. In turn, they were themselves adapting ideas developed in <cit.> for a higher order leapfrog integrator. In essence, we also adopt and extend these ideas to our implicit leapfrog scheme to similarly set up our higher order in time discretization.
+==================================================
+In order to keep this discussion somewhat self contained, we provided a minimal recourse to theory development and leave all details about the finite element scheme to the description in our earlier work. We begin by stating the Maxwell's equations in the form of a system for (p, E, H) where p is a fictitious electrical pressure variable, and E and H are the electric field intensity and magnetic flux density variables, respectively.
+==================================================
+∂ p∂ t + ∇·ε E     = 0  in Ω× (0, T], 
+    ∇ p + ε∂ E∂ t - ∇× H    = 0  in Ω× (0, T], 
+    μ∂ H∂ t + ∇× E    = 0  in Ω× (0, T],
+==================================================
+where Ω⊂^2/^3 is a domain with Lipschitz boundary ∂Ω and with the following homogeneous boundary conditions:
+==================================================
+to be consistent with our motivation for introducing p in conjunction with E, and because magnetic fields are divergence free due to there being no magnetic charges.
+==================================================
+The variational formulation for Equation (<ref>) with boundary conditions in Equation (<ref>) is given by: find (p, E, H) ∈H^1_ε^-1(Ω) ×H_ε(; Ω) ×H_μ(; Ω) such that:
+==================================================
+for t ∈ (0, T] with initial conditions as in Equation (<ref>). For this variational formulation of the Maxwell's system, we now state the fourth-order accurate discretization which is implicit in time and has a leapfrog like character in how the variables of interest are placed on two interleaved temporal meshes.
+==================================================
+Implicit LF_4 scheme: Find (p(t^n + 1/2), E(t^n + 1/2), H(t^n)) ∈H^1_ε^-1(Ω) ×H_ε(; Ω) ×H_μ(; Ω) such that:
+==================================================
+p^n + 1/2 - p^n - 1/2Δ tp - ε2( E^n + 1/2 + E^n - 1/2)∇p + Δ t^212ε2∇∇·( E^n + 1/2 + E^n - 1/2)∇p   =0, 
+    12∇(p^n + 1/2 + p^n - 1/2)E - Δ t^21212∇(p^n + 1/2 + p^n - 1/2)∇∇·E + εE^n + 1/2 - E^n - 1/2Δ tE
+     - 12( H^n + 1 + H^n )∇×E  - Δ t^21212μ^-1ε^-1∇×∇×( H^n + 1 + H^n )∇×E   = 0, 
+    μH^n + 1 - H^nΔ tH +  12∇×( E^n + 1/2 + E^n - 1/2)H +  Δ t^21212ε^-1μ^-1∇×( E^n + 1/2 + E^n - 1/2)∇×∇×H   = 0,
+==================================================
+for all p∈H^1_ε^-1(Ω),  E∈H_ε(; Ω) and H∈H_μ(; Ω), and with two uniform staggered discretizations of [0, T]: for the variables p and E as t^n + 1/2 (n + 1/2) Δ t, n = 0, 1, …, N - 1 for some Δ t > 0 being the fixed time step size such that N Δ t = T, and for the variable H as t^n  n Δ t, n = 0, 1, …, N. We shall use the following discretization for the first half time step for p and E, and for the first time step for H:
+==================================================
+p^1/2 - p_0Δ t/2p - 12ε2( E^1/2 + E_0 )∇p + 18·Δ t^212ε2∇∇·( E^1/2 + E_0 )∇p   = 0, 
+    1212∇(  p^1/2 +  p_0 )E - 18·Δ t^21212∇(  p^1/2 +  p_0 )∇∇·E + εE^1/2 - E_0Δ t/2E
+      - 12( H^1 + H_0 )∇×E -14·Δ t^21212μ^-1ε^-1∇×∇×( H^1 + H_0 )∇×E   = 0, 
+    μH^1 - H_0Δ tH + 1212∇×(E^1/2 + E_0 )H + 18·Δ t^21212ε^-1μ^-1∇×(E^1/2 + E_0 )∇×∇×H   = 0.
+==================================================
+We next provide the generalization of this idea to any arbitrary higher order R discretization, where R is an even natural number, to be as the following. We denote this the LF_R scheme for the system of Maxwell's equations.
+==================================================
+Implicit LF_R scheme: Find (p(t^n + 1/2), E(t^n + 1/2), H(t^n)) ∈H^1_ε^-1(Ω) ×H_ε(; Ω) ×H_μ(; Ω) such that:
+==================================================
+p^n + 1/2 - p^n - 1/2Δ tp - ε2( E^n + 1/2 + E^n - 1/2)∇p
+     + ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟 C_k_1𝔣(𝔞) ε2 (∇∇·)^∑_𝔪 = 1^𝔞 k_𝔪( E^n + 1/2 + E^n - 1/2)∇p =0,
+==================================================
+12∇(p^n + 1/2 + p^n - 1/2)E - ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟 C_k_1𝔣(𝔞) 12∇(p^n + 1/2 + p^n - 1/2)( ∇∇·)^∑_𝔪 = 1^𝔞 k_𝔪E
+     + εE^n + 1/2 - E^n - 1/2Δ tE -  12( H^n + 1 + H^n )∇×E
+     + ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟 C_k_1𝔣( 𝔞) (-1)^∑_𝔪 = 1^𝔞 k_𝔪12 ( με )^-∑_𝔪 = 1^𝔞 k_𝔪( ∇×∇×)^∑_𝔪 = 1^𝔞 k_𝔪( H^n + 1 + H^n )∇×E = 0,
+==================================================
+μH^n + 1 - H^nΔ tH +  12∇×( E^n + 1/2 + E^n - 1/2)H
+     - ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟 C_k_1𝔣(𝔞) (-1)^∑_𝔪 = 1^𝔞 k_𝔪12 (εμ)^-∑_𝔪 = 1^𝔞 k_𝔪∇×( E^n + 1/2 + E^n - 1/2)( ∇×∇×)^∑_𝔪 = 1^𝔞 k_𝔪H = 0,
+==================================================
+for all p∈H^1_ε^-1(Ω),  E∈H_ε(; Ω) and H∈H_μ(; Ω), and with same two uniform staggered discretizations of [0, T] as for fourth order. Again to bootstrap this scheme using the given initial values at t = 0 as in Equation (<ref>), we shall use the following discretization for the first half time step for p and E, and for the first time step for H:
+==================================================
+p^1/2 - p_0Δ t/2p - 12ε2( E^1/2 + E_0 )∇p
+     + ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟C_k_12^2 ∑_𝔪 = 1^𝔞 k_𝔪 + 1𝔣( 𝔞) ε2 (∇∇·)^∑_𝔪 = 1^𝔞 k_𝔪( E^1/2 + E_0 )∇p  = 0,
+==================================================
+1212∇(  p^1/2 +  p_0 )E - ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟C_k_12^2 ∑_𝔪 = 1^𝔞 k_𝔪 + 1𝔣(𝔞) 12∇(p^1/2 + p_0 )( ∇∇·)^∑_𝔪 = 1^𝔞 k_𝔪E
+     + εE^1/2 - E_0Δ t/2E - 12( H^1 + H_0 )∇×E
+     + ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟C_k_12^2 ∑_𝔪 = 1^𝔞 k_𝔪𝔣( 𝔞) (-1)^∑_𝔪 = 1^𝔞 k_𝔪12 ( με )^-∑_𝔪 = 1^𝔞 k_𝔪( ∇×∇×)^∑_𝔪 = 1^𝔞 k_𝔪( H^1 + H_0 )∇×E = 0,
+==================================================
+μH^1 - H_0Δ tH + 1212∇×(E^1/2 + E_0 )H
+     - ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟C_k_12^2 ∑_𝔪 = 1^𝔞 k_𝔪 + 1𝔣(𝔞) (-1)^∑_𝔪 = 1^𝔞 k_𝔪12 (εμ)^-∑_𝔪 = 1^𝔞 k_𝔪∇×( E^1/2 + E_0 )( ∇×∇×)^∑_𝔪 = 1^𝔞 k_𝔪H = 0,
+==================================================
+In all the time discretizations shown in Equations eqn:maxwell_p_lf4,eqn:maxwell_E_lf4,eqn:maxwell_H_lf4,eqn:maxwell_p0_lf4,eqn:maxwell_E0_lf4,eqn:maxwell_H0_lf4,eqn:maxwell_p_lfR,eqn:maxwell_E_lfR,eqn:maxwell_H_lfR,eqn:maxwell_p0_lfR,eqn:maxwell_E0_lfR,eqn:maxwell_H0_lfR, we use a superscript on our variables of interest to denote their values at the time corresponding to this time index, for example, p^n  p(t^n, x) and so on.
+==================================================
+Assuming ε, μ are time independent and computing the (i - 1)^th order partial derivative with respect to time ∂^i-1∂ t^i-1 of all the terms in Equation (<ref>) for 1 ≤ i ≤ R-1, we obtain:
+==================================================
+∂^i p∂ t^i + ∇·ε∂^i-1 E∂ t^i-1    = 0,  
+    ∇∂^i-1 p∂ t^i-1 + ε∂^i E∂ t^i - ∇×∂^i-1 H∂ t^i-1   = 0, 
+    μ∂^i H∂ t^i + ∇×∂^i-1 E∂ t^i-1   = 0],
+==================================================
+∂^i p∂ t^i = -∇·ε∂^i-1 E∂ t^i-1 = ∇·(∇∂^i-2 p∂ t^i-2 - ∇×∂^i-2 H∂ t^i-2) = ∇·∇∂^i-2 p∂ t^i-2, 
+    ∂^i p∂ t^i = ∇·∇∂^i-2 p∂ t^i-2,
+==================================================
+and this provides a recurrence relation for this i^th order partial derivative of p. For odd i, we shall use the partial derivative of p from Maxwell's equation as in Equation (<ref>) to terminate the recurrence at i = 1 and for even i, we shall terminate the recurrence at i = 0 interpreting the zeroth partial derivative as being equal to p itself. Therefore, we obtain the following cases for i being either odd or even:
+==================================================
+Next, using gradient of (<ref>) and curl of (<ref>) in (<ref>) gives the following recurrence relation for the i^th order partial derivative of E:
+==================================================
+ε∂^i E∂ t^i = -∇∂^i-1 p∂ t^i-1 + ∇×∂^i-1 H∂ t^i-1 = ∇∇·ε∂^i-2 E∂ t^i-2 - μ^-1∇×∇×∂^i-2 E∂ t^i-2, 
+    ε∂^i E∂ t^i =  ∇∇·ε∂^i-2 E∂ t^i-2 - μ^-1∇×∇×∂^i-2 E∂ t^i-2.
+==================================================
+Again, for odd i, we shall use the partial derivative of E from Maxwell's equation as in Equation (<ref>) to terminate the recurrence at i = 1 and for even i, we shall terminate the recurrence at i = 0 interpreting the zeroth partial derivative as being equal to E itself. Therefore, we obtain the following cases for i being either odd or even:
+==================================================
+Finally, taking the curl of (<ref>) and using it in (<ref>) provides the following recurrence relation for the i^th order partial derivative of H:
+==================================================
+μ∂^i H∂ t^i = - ∇×∂^i-1 E∂ t^i-1 =  ε^-1∇×∇∂^i-2 p∂ t^i-2 - ε^-1∇×∇×∂^i-2 H∂ t^i-2 =  - ε^-1∇×∇×∂^i-2 H∂ t^i-2, 
+    μ∂^i H∂ t^i = - ε^-1∇×∇×∂^i-2 H∂ t^i-2,
+==================================================
+For our implicit LF_4 time discretization scheme, we next show that this semidiscretization in time yields stable methods and we provide error estimates which show that this scheme is correspondingly convergent in each of its chosen sufficiently small but fixed time step.
+==================================================
+For the semidiscretization using the fourth order implicit leapfrog scheme as given in Equations eqn:maxwell_p_lf4,eqn:maxwell_E_lf4,eqn:maxwell_H_lf4,eqn:maxwell_p0_lf4,eqn:maxwell_E0_lf4,eqn:maxwell_H0_lf4, for any time step Δ t sufficiently small, there exists a positive bounded constant C independent of Δ t such that:
+==================================================
+Since Equations eqn:maxwell_p_lf4,eqn:maxwell_E_lf4,eqn:maxwell_H_lf4 are true for all p∈H^1_ε^-1(Ω), E∈H_ε(; Ω), H∈H_μ(; Ω), using p = 2 Δ t ε^-1( p^n + 1/2 + p^n - 1/2), E = 2 Δ t (E^n + 1/2 + E^n - 1/2) and H = 2 Δ t (H^n + 1 + H^n ) in them, we obtain the following:
+==================================================
+2 p^n+1/2 - p^n - 1/2ε^-1( p^n + 1/2 + p^n-1/2) - Δ t E^n + 1/2 + E^n - 1/2∇( p^n + 1/2 + p^n - 1/2)
+     + Δ t^312∇∇·(E^n + 1/2 + E^n - 1/2)∇( p^n + 1/2 + p^n - 1/2) =0,
+==================================================
+Δ t ∇( p^n + 1/2 + p^n - 1/2)E^n + 1/2 + E^n - 1/2 - Δ t^312∇( p^n + 1/2 + p^n - 1/2)∇∇·(E^n + 1/2 + E^n - 1/2)
+     + 2 ε(E^n + 1/2 - E^n - 1/2)E^n + 1/2 + E^n - 1/2  -
+      Δ t ( H^n + 1 + H^n )∇×( E^n + 1/2 + E^n - 1/2)
+     -  Δ t^312μ^-1ε^-1∇×∇×( H^n + 1 + H^n )∇×( E^n + 1/2 + E^n - 1/2) = 0,
+==================================================
+2 μ(H^n + 1 - H^n)H^n + 1 + H^n + Δ t ∇×( E^n + 1/2 + E^n - 1/2)H^n + 1 + H^n
+     + Δ t^312ε^-1μ^-1∇×( E^n + 1/2 + E^n - 1/2)∇×∇×(H^n + 1 + H^n ) = 0.
+==================================================
+2 ε^-1( p^n + 1/2 - p^n - 1/2)p^n + 1/2 + p^n - 1/2 + 2 ε(E^n + 1/2 - E^n - 1/2)E^n + 1/2 + E^n - 1/2 + 2 μ( H^n + 1 - H^n)H^n + 1 + H^n = 0.
+==================================================
+Now, p^1/2, E^1/2 and H^1 satisfy Equations eqn:maxwell_p0_lf4,eqn:maxwell_E0_lf4,eqn:maxwell_H0_lf4, and so using p = 2 Δ t ε^-1( p^1/2 + p^0 ), E = 2 Δ t (E^1/2 + E^0 ) and H = 4 Δ t (H^1 + H^0 ) there and repeating the arguments presented above leads us to the following estimate:
+==================================================
+Using 1- and 2-norm equivalence relation with C = √(3 [p_0^2_ε^-1 + E_0^2_ε + H_0^2_μ]), we obtain our desired result:
+==================================================
+For the semidiscretization using the fourth order implicit leapfrog scheme as given in Equations eqn:maxwell_p_lf4,eqn:maxwell_E_lf4,eqn:maxwell_H_lf4, and  eqn:maxwell_p0_lf4,eqn:maxwell_E0_lf4,eqn:maxwell_H0_lf4, for the solution (p, E, H) of Equations eqn:maxwell_p_wf,eqn:maxwell_E_wf,eqn:maxwell_H_wf with initial conditions as in Equation (<ref>) and assuming sufficient regularity with p ∈ C^5[0, T] ×H^1_ε^-1(Ω), E ∈ C^5[0, T] ×H_ε(; Ω), and H ∈ C^5[0, T] ×H_μ(; Ω), and for the time step Δ t sufficiently small, there exists a positive bounded constant C independent of Δ t such that:
+==================================================
+where e_p^n + 1/2 p(t^n + 1/2) - p^n+1/2, e_E^n + 1/2 E(t^n + 1/2) - E^n + 1/2 and e_H^n  H(t^n) - H^n are the errors in the time semidiscretization of p, E and H, respectively and at the indicated time indices.
+==================================================
+p(t) = p(t^n) + ∂ p∂ t(t^n)(t - t^n) + ∂^2 p∂ t^2(t^n) (t - t^n)^22! + ∂^3 p∂ t^3(t^n) (t - t^n)^33! + ∂^4 p∂ t^4(t^n) (t - t^n)^44! + ∫_t^n^t(t - s)^44!∂^5 p∂ t^5(s) ds,
+==================================================
+p(t^n + 1/2) = p(t^n) + ∂ p∂ t(t^n) (t^n + 1/2 - t^n) + ∂^2 p∂ t^2(t^n) (t^n + 1/2 - t^n)^22 + ∂^3 p∂ t^3(t^n) (t^n + 1/2 - t^n)^36
+     + ∂^4 p∂ t^4(t^n) (t^n + 1/2 - t^n)^424 + ∫_t^n^t^n + 1/2(t^n + 1/2 - s)^424∂^5 p∂ t^5(s) ds,
+==================================================
+p(t^n - 1/2) = p(t^n) + ∂ p∂ t(t^n)(t^n - 1/2 - t^n) + ∂^2 p∂ t^2(t^n) (t^n - 1/2 - t^n)^22 + ∂^3 p∂ t^3(t^n) (t^n - 1/2 - t^n)^36
+     + ∂^4 p∂ t^4(t^n) (t^n - 1/2 - t^n)^424 + ∫_t^n^t^n - 1/2(t^n - 1/2 - s)^424∂^5 p∂ t^5(s) ds.
+==================================================
+Subtracting these two equations, and using the result in the inner product term from the semidiscretization of the variational formulation leads to:
+==================================================
+R^n_p 1Δ t[∫_t^n - 1/2^t^n(t^n - 1/2 - s)^424∂^5 p∂ t^5(s) ds + ∫_t^n^t^n + 1/2(t^n + 1/2 - s)^424∂^5 p∂ t^5(s) ds ].
+==================================================
+εE(t^n + 1/2) - E(t^n - 1/2)Δ tE   = ε∂ E∂ t(t^n)E + Δ t^224ε∂^3 E∂ t^3(t^n)E + ε R^n_EE, 
+    μH(t^n + 1) - H(t^n)Δ tH   = μ∂ H∂ t(t^n + 1/2)H + Δ t^224μ∂^3 H∂ t^3(t^n + 1/2)H + μ R^n + 1/2_HH,
+==================================================
+R^n_E    1Δ t[ ∫_t^n - 1/2^t^n(t^n - 1/2 - s)^424∂^5 E∂ t^5(s) ds + ∫_t^n^t^n + 1/2(t^n + 1/2 - s)^424∂^5 E∂ t^5(s) ds ],
+==================================================
+R^n + 1/2_H    1Δ t[ ∫_t^n^t^n + 1/2(t^n - s)^424∂^5 H∂ t^5(s) ds + ∫_t^n + 1/2^t^n + 1(t^n + 1 - s)^424∂^5 H∂ t^5(s) ds].
+==================================================
+Using these terms in the weak formulation as in Equations eqn:maxwell_p_wf,eqn:maxwell_E_wf,eqn:maxwell_H_wf  at time t = t^n for p and E terms, and at time t = t^n + 1/2 for H and with the definition that:
+==================================================
+u(t^n) u(t^n + 1/2) + u(t^n - 1/2)2 - Δ t^28∂^2 u∂ t^2(t^n) - r_2,u^n,    H(t^n + 1/2) H(t^n+1) + H(t^n)2 - Δ t^28∂^2 H∂ t^2(t^n + 1/2) - r_2,H^n,
+==================================================
+r_1,u^n 12[∫_t^n^t^n + 1/2 (t^n + 1/2 - s) ∂^2 u∂ t^2(s) ds - ∫_t^n - 1/2^t^n (t^n - 1/2 - s) ∂^2 u∂ t^2(s) ds],
+==================================================
+r_1,H^n 12[  ∫_t^n + 1/2^t^n+1 (t^n+1 - s) ∂^2 H∂ t^2(s) ds - ∫_t^n^t^n + 1/2 (t^n - s) ∂^2 H∂ t^2(s) ds],
+==================================================
+r_2,u^n 12[∫_t^n^t^n + 1/2(t^n + 1/2 - s)^36∂^4 u∂ t^4(s) ds - ∫_t^n - 1/2^t^n(t^n - 1/2 - s)^36∂^4 u∂ t^4(s) ds],
+==================================================
+r_2,H^n 12[  ∫_t^n + 1/2^t^n+1(t^n+1 - s)^36∂^4 H∂ t^4(s) ds - ∫_t^n^t^n + 1/2(t^n - s)^36∂^4 H∂ t^4(s) ds],
+==================================================
+p(t^n + 1/2) - p(t^n - 1/2)Δ tp - ε2( E(t^n + 1/2) + E(t^n - 1/2) )∇p + Δ t^212ε2∇∇·( E(t^n + 1/2) + E(t^n - 1/2) )∇p
+     =R_p^n + ε∇· r_2,E^n - Δ t^212ε∇·∇∇· r_1,E^n p,
+==================================================
+12∇(p(t^n + 1/2) + p(t^n - 1/2) )E - Δ t^21212∇(p(t^n + 1/2) + p(t^n - 1/2) )∇∇·E + εE(t^n + 1/2) - E(t^n - 1/2)Δ tE
+     - 12( H(t^n + 1) + H(t^n) )∇×E  - Δ t^21212μ^-1ε^-1∇×∇×( H(t^n + 1) + H(t^n) )∇×E
+     =  ε R_E^n + ∇ r_2,p^n - ∇× r_2,H^n+1/2 - Δ t^212∇∇·∇ r_1,p^n - Δ t^212μ^-1ε^-1∇×∇×∇× r_1,H^n+1/2E,
+==================================================
+μH(t^n + 1) - H(t^n)Δ tH +  12∇×( E(t^n + 1/2) + E(t^n - 1/2) )H +  Δ t^21212ε^-1μ^-1∇×( E(t^n + 1/2) + E(t^n - 1/2) )∇×∇×H
+     =  μ R_H^n + 1/2 + ∇× r_2,E^n + Δ t^212ε^-1μ^-1∇×∇×∇× r_1,E^nH.
+==================================================
+Then subtracting the fourth order implicit leapfrog semidiscretization as in Equations eqn:maxwell_p_lf4,eqn:maxwell_E_lf4,eqn:maxwell_H_lf4 leads us to the following set of equations:
+==================================================
+e_p^n + 1/2 - e_p^n - 1/2Δ tp - 12ε(e_E^n + 1/2 + e_E^n - 1/2)∇p + Δ t^224ε∇∇·( e_E^n + 1/2 + e_E^n - 1/2)∇p
+     = R_p^n + ε∇· r_2,E^n - Δ t^212ε∇·∇∇· r_1,E^n p,
+==================================================
+12∇(e_p^n + 1/2 + e_p^n - 1/2)E  - Δ t^224∇(e_p^n + 1/2 + e_p^n - 1/2)∇∇·E + εe_E^n + 1/2 - e_E^n - 1/2Δ tE
+     - 12e_H^n + 1 + e_H^n∇×E  - Δ t^224μ^-1ε^-1∇×∇×( e_H^n + 1 + e_H^n )∇×E
+     = ε R_E^n + ∇ r_2,p^n - ∇× r_2,H^n+1/2 - Δ t^212∇∇·∇ r_1,p^n - Δ t^212μ^-1ε^-1∇×∇×∇× r_1,H^n+1/2E,
+==================================================
+μe_H^n + 1 - e_H^nΔ tH +  12∇×(e_E^n+1/2 + e_E^n - 1/2)H +  Δ t^224ε^-1μ^-1∇×(e_E^n + 1/2 + e_E^n - 1/2)∇×∇×H
+     = μ R_H^n + 1/2 + ∇× r_2,E^n + Δ t^212ε^-1μ^-1∇×∇×∇× r_1,E^nH.
+==================================================
+Likewise, for the semidiscrete approximation of the initial system as in Equations eqn:maxwell_p0_lf4,eqn:maxwell_E0_lf4,eqn:maxwell_H0_lf4, we obtain for their errors the following system of equations:
+==================================================
+e_p^1/2 - e_p^0Δ t/2p - 14ε(e_E^1/2 + e_E^0 )∇p + Δ t^2192ε∇∇·( e_E^1/2 + e_E^0 )∇p = 12 R_p^0 -   ε2∇· r_2,E^0 - Δ t^296ε∇·∇∇· r_1,E^0p,
+==================================================
+14∇(e_p^1/2 + e_p^0 )E - Δ t^2192∇( e_p^1/2 +  e_p^0 )∇∇·E + εe_E^1/2 - e_E^0Δ t/2E  - 12e_H^1 + e_H^0∇×E - Δ t^296μ^-1ε^-1∇×∇×( e_H^1 + e_H^0 )E
+     = ε2 R_E^0 + 12∇ r_2,p^0 - ∇× r_2,H^1/2 - Δ t^296∇∇·∇ r_1,p^0 - Δ t^248μ^-1ε^-1∇×∇×∇× r_1,H^1/2E,
+==================================================
+μe_H^1 - e_H^0Δ tH + 14∇×( e_E^1/2 + e_E^0 )H + Δ t^2192ε^-1μ^-1∇×(e_E^1/2 + e_E^0 )∇×∇×H
+      = μ R_H^1/2+ 12∇× r_2,E^0 + Δ t^296ε^-1μ^-1∇×∇×∇× r_1,E^0H,
+==================================================
+R^0_u    1Δ t[ ∫_t^0^t^1/4(t^0 - s)^424∂^5 u∂ t^5(s) ds + ∫_t^1/4^t^1/2(t^1/2 - s)^424∂^5 u∂ t^5(s) ds ],
+==================================================
+R^1/2_H    1Δ t[ ∫_t^0^t^1/2(t^0 - s)^424∂^5 H∂ t^5(s) ds + ∫_t^1/2^t^1(t^1 - s)^424∂^5 H∂ t^5(s) ds],
+==================================================
+r_2,u^0    12[∫_t^1/4^t^1/2(t^1/2 - s)^36∂^4 u∂ t^4(s) ds - ∫_t^0^t^1/4(t^0 - s)^36∂^4 u∂ t^4(s) ds],
+==================================================
+Now, in this set of weak formulation equations for the errors, we choose the test functions to be p = 2 Δ t ε^-1( e_p^n + 1/2 + e_p^n - 1/2), E = 2 Δ t ( e_E^n + 1/2 + e_E^n - 1/2) and H = 2 Δ t ( e_H^n + e_H^n - 1). Next, by following essentially the same sequence of steps as in Theorem <ref>, we obtain the estimate for these error terms to be:
+==================================================
+e_p^n + 1/2^2_ε^-1 - e_p^n - 1/2^2_ε^-1 + e_E^n + 1/2^2_ε - e_E^n - 1/2^2_ε + e_H^n+1^2_μ -  e_H^n^2_μ
+    ≤Δ t [ e_p^n + 1/2^2_ε^-1 - e_p^n - 1/2^2_ε^-1 + e_E^n + 1/2^2_ε - e_E^n - 1/2^2_ε + e_H^n+1^2_μ -  e_H^n^2_μ] 
+     +
+     Δ t [ R_p^n^2_ε^-1 + R_E^n^2_ε + R_H^n + 1/2^2_μ + ∇ r_2,p^n ^2_ε^-1 + ∇· r_2,E^n^2_ε + ε^-1μ^-1∇× r_2,E^n^2_ε +  ε^-1μ^-1∇× r_2,H^n + 1/2^2_μ. 
+    . + Δ t^4144( ∇∇·∇ r_1,p^n ^2_ε^-1 + ∇·∇∇· r_1,E^n^2_ε + ε^-3μ^-3∇×∇×∇× r_1,E^n^2_ε +  ε^-3μ^-3∇×∇×∇× r_1,H^n + 1/2^2_μ) ].
+==================================================
+e_p^N - 1/2^2_ε^-1 - e_p^1/2^2_ε^-1 + e_E^N - 1/2^2_ε - e_E^1/2^2_ε + e_H^N^2_μ -  e_H^1^2_μ
+    ≤Δ t [ e_p^N - 1/2^2_ε^-1 - e_p^1/2^2_ε^-1 + e_E^N - 1/2^2_ε - e_E^1/2^2_ε + e_H^N^2_μ -  e_H^1^2_μ] + 2 Δ t ∑_n = 1^N - 1[ e_p^n + 1/2^2_ε^-1 + e_E^n + 1/2^2_ε + e_H^n+1^2_μ] 
+     +
+     Δ t ∑_n = 1^N - 1[ R_p^n^2_ε^-1 + R_E^n^2_ε + R_H^n + 1/2^2_μ + ∇ r_2,p^n ^2_ε^-1 + ∇· r_2,E^n^2_ε + ε^-1μ^-1∇× r_2,E^n^2_ε +  ε^-1μ^-1∇× r_2,H^n + 1/2^2_μ. 
+    . + Δ t^4144( ∇∇·∇ r_1,p^n ^2_ε^-1 + ∇·∇∇· r_1,E^n^2_ε + ε^-3μ^-3∇×∇×∇× r_1,E^n^2_ε +  ε^-3μ^-3∇×∇×∇× r_1,H^n + 1/2^2_μ) ].
+==================================================
+Similarly, for initial case choosing test functions to be p = 2 Δ t ε^-1( e_p^1/2 + e_p^0 ), E = 2 Δ t ( e_E^1/2  + e_E^0 ) and H = 4 Δ t ( e_H^1 + e_H^0 ), we get
+==================================================
+e_p^1/2^2_ε^-1 - e_p^0^2_ε^-1 + e_E^1/2^2_ε - e_E^0^2_ε + e_H^1^2_μ -  e_H^0^2_μ
+    ≤Δ t [   e_p^1/2^2_ε^-1 - e_p^0^2_ε^-1 + e_E^1/2^2_ε - e_E^0^2_ε + e_H^1^2_μ -  e_H^0^2_μ] 
+     +
+     Δ t [ R_p^0^2_ε^-1 + R_E^0^2_ε + R_H^1/2^2_μ + ∇ r_2,p^0 ^2_ε^-1 + ∇· r_2,E^0^2_ε + ε^-1μ^-1∇× r_2,E^0^2_ε +  ε^-1μ^-1∇× r_2,H^1/2^2_μ. 
+    . + Δ t^4144( ∇∇·∇ r_1,p^0 ^2_ε^-1 + ∇·∇∇· r_1,E^0^2_ε + ε^-3μ^-3∇×∇×∇× r_1,E^0^2_ε +  ε^-3μ^-3∇×∇×∇× r_1,H^1/2^2_μ) ].
+==================================================
+Adding above two equations and using the initial conditions as in Equation (<ref>), and the positivity of all the right hand side terms, we have that:
+==================================================
+e_p^N - 1/2^2_ε^-1 + e_E^N - 1/2^2_ε + e_H^N^2_μ≤1 + Δ t1 - Δ t[ e_p^0^2_ε^-1 + e_E^0^2_ε + e_H^0^2_μ] + 
+    Δ t1 - Δ t∑_n = 0^N - 1[ 2 ( e_p^n + 1/2^2_ε^-1 + e_E^n + 1/2^2_ε + e_H^n + 1^2_μ) + ( R_p^n^2_ε^-1 + R_E^n^2_ε + R_H^n + 1/2^2_μ. 
+    .
+    + ∇ r_2,p^n ^2_ε^-1 + ∇· r_2,E^n^2_ε + ε^-1μ^-1∇× r_2,E^n^2_ε +  ε^-1μ^-1∇× r_2,H^n + 1/2^2_μ)
+==================================================
++ Δ t^4144( ∇∇·∇ r_1,p^n ^2_ε^-1 + ∇·∇∇· r_1,E^n^2_ε + ε^-3μ^-3∇×∇×∇× r_1,E^n^2_ε +  ε^-3μ^-3∇×∇×∇× r_1,H^n + 1/2^2_μ) ].
+==================================================
+e_p^N - 1/2^2_ε^-1 + e_E^N - 1/2^2_ε +e_H^N^2_μ≤[ 6 Δ t5∑_n = 0^N - 1(R_p^n^2_ε^-1 + R_E^n^2_ε + R_H^n + 1/2^2_μ. 
+     + . ∇ r_2ṭ,p^n ^2_ε^-1 + ∇· r_2,E^n^2_ε + ε^-1μ^-1∇× r_2,E^n^2_ε +  ε^-1μ^-1∇× r_2,H^n + 1/2^2_μ.
+==================================================
++ . Δ t^4144( ∇∇·∇ r_1,p^n ^2_ε^-1 + ∇·∇∇· r_1,E^n^2_ε + ε^-3μ^-3∇×∇×∇× r_1,E^n^2_ε. . 
+    . . +  ε^-3μ^-3∇×∇×∇× r_1,H^n + 1/2^2_μ)  ) +
+      75(e_p^0^2_ε^-1 + e_E^0^2_ε  + e_H^0^2_μ)] exp( 4 T ).
+==================================================
+Now, we need to obtain bounding estimates for each of the Taylor remainder terms and to do so, we first consider the first remainder term corresponding to p and argue as follows:
+==================================================
+R^n_p^2_ε^-1   = 1(24)^2 ( Δ t )^2[]∫_t^n - 1^t^n - 1/2 (t^n - 1 - s)^4 ∂^5 p∂ t^5(s) ds + ∫_t^n - 1/2^t^n (t^n - s)^4 ∂^5 p∂ t^5(s) ds^2_ε^-1, 
+       ≤1(24)^2 ( Δ t )^2[]∫_t^n - 1^t^n (t^n - s)^4 ∂^5 p∂ t^5(s) ds^2_ε^-1,   (using t^n - 1 < t^n)
+       ≤1(24)^2 (Δ t)^2∫_t^n - 1^t^n (s - t^n)^8 ds ∫_t^n - 1^t^n[]∂^5 p∂ t^5(s)^2_ε^-1 ds,   (by Cauchy-Schwarz)
+       = ( Δ t )^7(24)^2 · 9∫_t^n - 1^t^n[]∂^5 p∂ t^5(s)^2_ε^-1 ds,
+==================================================
+∑_n = 0^N R^n_p^2_ε^-1≤( Δ t )^7(24)^2 · 9∫_0^T []∂^5 p∂ t^5(s)^2_ε^-1 ds = ( Δ t )^7(24)^2 · 9[]∂^5 p∂ t^5^2_L^2[0, T] × L^2_ε^-1(Ω).
+==================================================
+R^n_E^2_ε   ≤( Δ t )^7(24)^2 · 9[]∂^5 E∂ t^5^2_L^2[0, T] × L^2_ε(Ω),    ∑_n = 0^N - 1R^n + 1/2_H^2_μ   ≤( Δ t )^7(24)^2 · 9[]∂^5 H∂ t^5^2_L^2[0, T] × L^2_μ(Ω), 
+    ∑_n = 0^N - 1∇ r^n_2,p^2_ε^-1   ≤( Δ t )^72^7 · 72[]∂^4 (∇ p )∂ t^4^2_L^2[0, T] ×H^1_ε^-1(Ω),    ∑_n = 0^N - 1∇· r^n_2,E^2_ε   ≤( Δ t )^72^7 · 72[]∂^4 (∇· E)∂ t^4^2_L^2[0, T] × L^2_ε(Ω),  
+    ∑_n = 0^N - 1∇× r^n_2,E^2_ε   ≤( Δ t )^72^7 · 72[]∂^4 (∇× E)∂ t^4^2_L^2[0, T] ×H_ε(; Ω),    ∑_n = 0^N - 1∇× r^n + 1/2_2,H^2_μ   ≤( Δ t )^72^7 · 72[]∂^4 (∇× H)∂ t^4^2_L^2[0, T] × L^2_μ(Ω), 
+    ∑_n = 0^N - 1∇∇·∇ r^n_1,p^2_ε^-1   ≤( Δ t )^348[]∂^2 (∇∇·∇ p )∂ t^2^2_L^2[0, T] ×H^1_ε^-1(Ω),    ∑_n = 0^N - 1∇·∇∇· r^n_1,E^2_ε   ≤( Δ t )^348[]∂^2 (∇·∇∇· E)∂ t^2^2_L^2[0, T] × L^2_ε(Ω),
+==================================================
+∑_n = 0^N - 1∇×∇×∇× r^n_1,E^2_ε   ≤( Δ t )^348[]∂^2 (∇×∇×∇× E)∂ t^2^2_L^2[0, T] ×H_ε(; Ω), 
+        ∑_n = 0^N - 1∇×∇×∇× r^n + 1/2_1,H^2_μ   ≤( Δ t )^348[]∂^2 (∇×∇×∇× H)∂ t^2^2_L^2[0, T] × L^2_μ(Ω).
+==================================================
+Finally, using the regularity assumptions for p, E and H, and 1- and 2-norm equivalence, we obtain the required result:
+==================================================
+We now present the error analysis for the full discretization of the Maxwell's equations using finite elements and with our implicit LF_4 time integration method.
+Let Π_h^0, Π_h^1 and Π_h^2 denote the respective smoothed L^2 projection operators as in <cit.>. Also, we will define the error for p, E and H at time n Δ t under the full discretization as again in <cit.>:
+==================================================
+η^n + 1/2    p(t^n + 1/2) - Π_h^0 p(t^n + 1/2),           η_h^n + 1/2       p_h^n + 1/2  - Π_h^0 p(t^n + 1/2),
+==================================================
+ζ^n + 1/2    E(t^n + 1/2) - Π_h^1 E(t^n + 1/2),           ζ_h^n + 1/2       E_h^n + 1/2 - Π_h^1 E(t^n + 1/2),
+==================================================
+For the fourth order implicit leapfrog scheme as in Equations eqn:maxwell_p_lf4,eqn:maxwell_E_lf4,eqn:maxwell_H_lf4, using a de Rham sequence of finite dimensional subspaces of the corresponding function spaces for the spatial discretization of (p^n + 1/2, E^n + 1/2, H^n + 1), we obtain the following discrete problem: find (p_h^n + 1/2, E_h^n + 1/2, H_h^n + 1) ∈ U_h × V_h × W_h ⊆H_ε^-1^1 ×H_ε(; Ω) ×H_μ(; Ω) such that:
+==================================================
+p_h^n + 1/2 - p_h^n - 1/2Δ tp - ε2( E_h^n + 1/2 + E_h^n - 1/2)∇p + Δ t^212ε2∇∇·( E_h^n + 1/2 + E_h^n - 1/2)∇p   =0, 
+    12∇(p_h^n + 1/2 + p_h^n - 1/2)E - Δ t^21212∇(p_h^n + 1/2 + p_h^n - 1/2)∇∇·E + εE_h^n + 1/2 - E_h^n - 1/2Δ tE
+     - 12( H_h^n + 1 + H_h^n )∇×E  - Δ t^21212μ^-1ε^-1∇×∇×( H_h^n + 1 + H_h^n )∇×E   = 0, 
+    μH_h^n + 1 - H_h^nΔ tH +  12∇×( E_h^n + 1/2 + E_h^n - 1/2)H +  Δ t^21212ε^-1μ^-1∇×( E_h^n + 1/2 + E_h^n - 1/2)∇×∇×H   = 0,
+==================================================
+for all (p, E, H) ∈ U_h × V_h × W_h, and for n ∈{1, …, N - 1}. 
+The n = 0 bootstrapping as in Equations eqn:maxwell_p0_lf4,eqn:maxwell_E0_lf4,eqn:maxwell_H0_lf4 leads to the discrete problem: find (p_h^1/2, E_h^1/2, H_h^1) ∈ U_h × V_h × W_h ⊆H_ε^-1^1 ×H_ε(; Ω) ×H_μ(; Ω) such that:
+==================================================
+p_h^1/2 - p_h^0Δ t/2p - 12ε2( E_h^1/2 + E_h^0 )∇p + 18·Δ t^212ε2∇∇·( E_h^1/2 + E_h^0 )∇p   = 0, 
+    1212∇(  p_h^1/2 +  p_h^0 )E - 18·Δ t^21212∇(  p_h^1/2 +  p_h^0 )∇∇·E + εE_h^1/2 - E_h^0Δ t/2E
+      - 12( H_h^1 + H_h^0 )∇×E -14·Δ t^21212∇×∇×( H_h^1 + H_h^0 )∇×E   = 0, 
+    μH_h^1 - H_h^0Δ tH + 1212∇×(E_h^1/2 + E_h^0 )H + 18·Δ t^21212∇×(E_h^1/2 + E_h^0 )∇×∇×H   = 0.
+==================================================
+for all (p, E, H) ∈ U_h × V_h × W_h given (p_h^0, E_h^0, H_h^0) ∈ U_h × V_h × W_h. 
+With this, we can now state and prove our theorem for convergence of errors in the full discretization of the system of Maxwell's equations using the fourth order implicit leap-frog scheme.
+==================================================
+Let p ∈ C^5[0, T] ×H^1_ε^-1(Ω), E ∈ C^5[0, T] ×H_ε(; Ω), and H ∈ C^5[0, T] ×H_μ(; Ω) be the solution to the variational formulation of the Maxwell's equations as in Equations eqn:maxwell_p_wf,eqn:maxwell_E_wf,eqn:maxwell_H_wf, and let (p_h^n + 1/2, E_h^n + 1/2, H_h^n + 1) be the solution of the fully discretized Maxwell's equations using the fourth order implicit leapfrog scheme as in Equations eqn:maxwell_p_lf4_full,eqn:maxwell_E_lf4_full,eqn:maxwell_H_lf4_full,eqn:maxwell_p0_lf4_full,eqn:maxwell_E0_lf4_full,eqn:maxwell_H0_lf4_full. If the fixed time step Δ t > 0 and the mesh parameter h > 0 are sufficiently small, then there exists a positive bounded constant C independent of both Δ t and h such that the following error estimate holds:
+==================================================
+where the finite element subspaces U_h, V_h and W_h are each spanned by their respective Whitney form basis of polynomial order r ≥ 1.
+==================================================
+First, we shall subtract the set of equations for the full discretization as in Equations eqn:maxwell_p_lf4_full,eqn:maxwell_E_lf4_full,eqn:maxwell_H_lf4_full from Equations eqn:remainder_p_lf4,eqn:remainder_E_lf4,eqn:remainder_H_lf4,  and then use the error terms in Equations eqn:p_fullerror,eqn:E_fullerror,eqn:H_fullerror and thereby obtain:
+==================================================
+e_p_h^n + 1/2 - e_p_h^n - 1/2Δ tp - 12ε(e_E_h^n + 1/2 + e_E_h^n - 1/2)∇p + Δ t^224ε∇∇·( e_E_h^n + 1/2 + e_E_h^n - 1/2)∇p
+     = R_p^n - ε∇· r_2,E^n - Δ t^212ε∇·∇∇· r_1,E^n p,
+==================================================
+12∇(e_p_h^n + 1/2 + e_p_h^n - 1/2)E  - Δ t^224∇(e_p_h^n + 1/2 + e_p_h^n - 1/2)∇∇·E + εe_E_h^n + 1/2 - e_E_h^n - 1/2Δ tE
+     - 12e_H_h^n + 1 + e_H_h^n∇×E  - Δ t^224μ^-1ε^-1∇×∇×( e_H_h^n + 1 + e_H_h^n )∇×E
+     = ε R_E^n + ∇ r_2,p^n - ∇× r_2,H^n+1/2 - Δ t^212∇∇·∇ r_1,p^n - Δ t^212μ^-1ε^-1∇×∇×∇× r_1,H^n+1/2E,
+==================================================
+μe_H_h^n + 1 - e_H_h^nΔ tH +  12∇×(e_E_h^n+1/2 + e_E_h^n - 1/2)H +  Δ t^224ε^-1μ^-1∇×(e_E_h^n + 1/2 + e_E_h^n - 1/2)∇×∇×H
+     = μ R_H^n + 1/2 + ∇× r_2,E^n + Δ t^212ε^-1μ^-1∇×∇×∇× r_1,E^nH.
+==================================================
+Next, using the values of the error terms e_p_h^n, e_E_h^n and e_H_h^n as in Equations eqn:p_fullerror,eqn:E_fullerror,eqn:H_fullerror in the above equations, we get:
+==================================================
+(η^n + 1/2 - η^n - 1/2) - ( η^n + 1/2_h - η^n - 1/2_h )Δ tp  - 12ε( ( ζ^n + 1/2 + ζ^n - 1/2) - (ζ_h^n + 1/2 + ζ^n + 1/2_h ) )∇p
+     + Δ t^224ε∇∇·( ( ζ^n + 1/2 + ζ^n - 1/2) - (ζ_h^n + 1/2 + ζ^n + 1/2_h ) )∇p = R_p^n - ε∇· r_2,E^n - Δ t^212ε∇·∇∇· r_1,E^n p,
+==================================================
+12∇( ( η^n + 1/2 + η^n - 1/2) - ( η^n + 1/2_h + η^n - 1/2_h ) )E - Δ t^224∇( ( η^n + 1/2 + η^n - 1/2) - ( η^n + 1/2_h + η^n - 1/2_h ))∇∇·E
+     + ε( ζ^n + 1/2 - ζ^n - 1/2) - (ζ^n + 1/2_h - ζ^n - 1/2_h )Δ tE  -
+      12( ( ξ^n + 1 + ξ^n) - (ξ^n + 1_h - ξ^n_h ) )∇×E
+     - Δ t^224μ^-1ε^-1∇×∇×( ( ξ^n + 1 + ξ^n) - (ξ^n + 1_h - ξ^n_h ) )∇×E
+     = ε R_E^n + ∇ r_2,p^n - ∇× r_2,H^n+1/2 - Δ t^212∇∇·∇ r_1,p^n - Δ t^212μ^-1ε^-1∇×∇×∇× r_1,H^n+1/2E,
+==================================================
+μ(ξ^n + 1 - ξ^n) - ( ξ^n + 1_h - ξ^n_h )Δ tH  + 12∇×( ( ζ^n + 1/2 + ζ^n - 1/2) - ( ζ^n + 1/2_h + ζ^n - 1/2_h ) )H
+     +  Δ t^224ε^-1μ^-1∇×(( ζ^n + 1/2 + ζ^n - 1/2) - ( ζ^n + 1/2_h + ζ^n - 1/2_h ) )∇×∇×H = μ R_H^n + 1/2 + ∇× r_2,E^n + Δ t^212ε^-1μ^-1∇×∇×∇× r_1,E^nH.
+==================================================
+Since these equations are true for all (p, E, H) ∈ U_h × V_h × W_h, we choose p = -2 Δ t ε^-1( η_h^n + 1/2 + η_h^n - 1/2), E = -2 Δ t ( ζ_h^n + 1/2 + ζ_h^n - 1/2) and H = -2 Δ t ( ξ_h^n + ξ_h^n - 1) and using the fact that ∇ U_h ⊆ V_h and ∇× V_h ⊆ W_h, we obtain:
+==================================================
+2 ε^-1( η^n + 1/2_h - η^n - 1/2_h )η^n + 1/2_h + η^n - 1/2_h + 2 ε( ζ^n + 1/2_h - ζ^n - 1/2_h )ζ^n + 1/2_h + ζ^n - 1/2_h  + 2 μ( ξ^n_h - ξ^n - 1_h )ξ^n_h + ξ^n - 1_h =
+==================================================
+2 ε^-1( η^n + 1/2 - η^n -  1/2)η^n + 1/2_h + η^n - 1/2_h  + 2 ε( ζ^n + 1/2 - ζ^n - 1/2)ζ^n + 1/2_h + ζ^n - 1/2_h + 2 μ( ξ^n - ξ^n - 1)ξ^n_h + ξ^n - 1_h  +
+==================================================
+2 Δ t - R_p^n + ε∇· r_2,E^n + Δ t^212ε∇·∇∇· r_1,E^nε^-1( η^n + 1/2_h + η^n - 1/2_h ) + 2 Δ t -ε R_E^n - ∇ r_2,p^n + ∇× r_2,H^n + 1/2 + Δ t^212∇∇·∇ r_1,p^n
+     + Δ t^212μ^-1ε^-1∇×∇×∇× r_1,H^n + 1/2ζ^n + 1/2_h + ζ^n - 1/2_h  + 2 Δ t -μ R_H^n + 1/2 - ∇× r_2,E^n + Δ t^212μ^-1ε^-1∇×∇×∇× r_1,E^nξ^n_h + ξ^n - 1_h,
+==================================================
+Consider that  ε^-1(η^n + 1/2 - η^n - 1/2) = ε^-1(I - Π_h^0) ( p(t^n + 1/2) - p(t^n + 1/2)) by Equation (<ref>). Using the Taylor theorem with remainder as in Theorem <ref>, applying the Cauchy-Schwarz, AM-GM, and Triangle inequalities, we have the following resulting inequality:
+==================================================
+2 ε^-1( η^n + 1/2 - η^n - 1/2)η^n + 1/2_h + η^n - 1/2_h    = 2 Δ t ε^-1( I - Π_h^0 ) ∂ p∂ t (t^n) +  Δ t^224∂^3 p∂ t^3 (t^n) η^n + 1/2_h + η^n - 1/2_h
+        + 2 Δ t ε^-1( I - Π_h^0 ) R_p^nη^n + 1/2_h + η^n - 1/2_h
+       ≤Δ t [ [](I - Π_h^0) ∂ p∂ t(t^n)^2_ε^-1 + Δ t^4(24)^2[](I - Π_h^0) ∂^3 p∂ t^3(t^n)^2_ε^-1
+        +  [](I - Π_h^0) R_p^n^2_ε^-1]  + 6 Δ t [ η_h^n + 1/2^2_ε^-1 + η_h^n - 1/2^2_ε^-1].
+==================================================
+Similarly, using Equations eqn:E_fullerror_sub,eqn:H_fullerror_sub for the error terms for E and H, we obtain:
+==================================================
+2  ε( ζ^n + 1/2 - ζ^n - 1/2)ζ^n + 1/2_h + ζ^n - 1/2_h≤Δ t [ [](I - Π_h^1) ∂ E∂ t(t^n)^2_ε + Δ t^4(24)^2[](I - Π_h^1) ∂^3 E∂ t^3(t^n)^2_ε
+      +  [](I - Π_h^1) R_E^n^2_ε]  + 6 Δ t [ ζ_h^n + 1/2^2_ε + ζ_h^n - 1/2^2_ε],
+==================================================
+2 μ( ξ^n + 1 - ξ^n )ξ^n + 1_h + ξ^n_h≤Δ t [ [](I - Π_h^2) ∂ H∂ t(t^n + 1/2)^2_μ + Δ t^4(24)^2[](I - Π_h^2) ∂^3 H∂ t^3(t^n + 1/2)^2_μ
+      +  [](I - Π_h^2) R_H^n + 1/2^2_μ]  + 6 Δ t [ ξ_h^n + 1^2_μ + ξ_h^n^2_μ].
+==================================================
+2 [ η_h^n + 1/2^2_ε^-1 - η_h^n - 1/2^2_ε^-1 + ζ_h^n + 1/2^2_ε - ζ_h^n - 1/2^2_ε + ξ_h^n+1^2_μ - ξ_h^n^2_μ] ≤
+    Δ t [ [](I - Π_h^0) ∂ p∂ t(t^n)^2_ε^-1 + Δ t^4(24)^2[](I - Π_h^0) ∂^3 p∂ t^3(t^n)^2_ε^-1 + [](I - Π_h^0) R_p^n^2_ε^-1 
+    + [](I - Π_h^1) ∂ E∂ t(t^n)^2_ε
+     + Δ t^4(24)^2[](I - Π_h^1) ∂^3 E∂ t^3(t^n)^2_ε + [](I - Π_h^1) R_E^n^2_ε +
+      [](I - Π_h^2) ∂ H∂ t(t^n + 1/2)^2_μ + Δ t^4(24)^2[](I - Π_h^2) ∂^3 H∂ t^3(t^n + 1/2)^2_μ
+     + [](I - Π_h^2) R_H^n + 1/2^2_μ  + 8 ( η_h^n^2_ε^-1 + η_h^n - 1^2_ε^-1 + ζ_h^n^2_ε + ζ_h^n - 1^2_ε + ξ_h^n^2_μ + ξ_h^n - 1^2_μ) 
+      + R_p^n^2_ε^-1 + R_E^n^2_ε + R_H^n + 1/2^2_μ + ∇ r_1,p^n ^2_ε^-1 + ∇· r_1,E^n^2_ε + ε^-1μ^-1∇× r_1,E^n^2_ε +  ε^-1μ^-1∇× r_1,H^n + 1/2^2_μ
+==================================================
++ Δ t^4144( ∇∇·∇ r_2,p^n ^2_ε^-1 + ∇·∇∇· r_2,E^n^2_ε + ε^-3μ^-3∇×∇×∇× r_2,E^n^2_ε +  ε^-3μ^-3∇×∇×∇× r_2,H^n + 1/2^2_μ)  ].
+==================================================
+η_h^N - 1/2^2_ε^-1 + ζ_h^N - 1/2^2_ε + ξ_h^N^2_μ≤ 8 Δ t ∑_n = 1^N-1[ η_h^n + 1/2^2_ε^-1 +ζ_h^n + 1/2^2_ε + ξ_h^n^2_μ] + Δ t ∑_n = 0^N[ [](I - Π_h^0) ∂ p∂ t(t^n)^2_ε^-1
+     + Δ t^4(24)^2[](I - Π_h^0) ∂^3 p∂ t^3(t^n)^2_ε^-1 + 
+      [](I - Π_h^0) R_p^n^2_ε^-1 + [](I - Π_h^1) ∂ E∂ t(t^n - 1/2)^2_ε  + Δ t^4(24)^2[](I - Π_h^1) ∂^3 E∂ t^3(t^n)^2_ε + [](I - Π_h^1) R_E^n^2_ε
+     + [](I - Π_h^2) ∂ H∂ t(t^n + 1/2)^2_μ + Δ t^4(24)^2[](I - Π_h^2) ∂^3 H∂ t^3(t^n + 1/2)^2_μ  + [](I - Π_h^2) R_H^n^2_μ  + R_p^n^2_ε^-1 + R_E^n^2_ε + R_H^n + 1/2^2_μ
+     + ∇ r_1,p^n ^2_ε^-1 + ∇· r_1,E^n^2_ε + ε^-1μ^-1∇× r_1,E^n^2_ε +  ε^-1μ^-1∇× r_1,H^n + 1/2^2_μ 
+    +  Δ t^4144( ∇∇·∇ r_2,p^n ^2_ε^-1 + ∇·∇∇· r_2,E^n^2_ε. 
+    . + ε^-3μ^-3∇×∇×∇× r_2,E^n^2_ε +  ε^-3μ^-3∇×∇×∇× r_2,H^n + 1/2^2_μ)  ] + [ η_h^1/2^2_ε^-1 + ζ_h^1/2^2_ε + ξ_h^0^2_μ].
+==================================================
+Likewise, for the semidiscrete approximation of the initial system as in Equations eqn:maxwell_p0_lf4,eqn:maxwell_E0_lf4,eqn:maxwell_H0_lf4, we obtain for their errors the following system of equations:
+==================================================
+e_p_h^1/2 - e_p_h^0Δ t/2p - 14ε(e_E_h^1/2 + e_E_h^0 )∇p + Δ t^2192ε∇∇·( e_E_h^1/2 + e_E_h^0 )∇p = 12 R_p^0 -   ε2∇· r_2,E^0 - Δ t^296ε∇·∇∇· r_1,E^0p,
+==================================================
+14∇(e_p^1/2 + e_p^0 )E - Δ t^2192∇( e_p_h^1/2 +  e_p_h^0 )∇∇·E + εe_E_h^1/2 - e_E_h^0Δ t/2E  - 12e_H_h^1 + e_H_h^0∇×E
+     - Δ t^296μ^-1ε^-1∇×∇×( e_H_h^1 + e_H_h^0 )E = ε2 R_E^0 + 12∇ r_2,p^0 - ∇× r_2,H^1/2 - Δ t^296∇∇·∇ r_1,p^0 - Δ t^248μ^-1ε^-1∇×∇×∇× r_1,H^1/2E,
+==================================================
+μe_H_h^1 - e_H_h^0Δ tH + 14∇×( e_E_h^1/2 + e_E_h^0 )H + Δ t^2192ε^-1μ^-1∇×(e_E_h^1/2 + e_E_h^0 )∇×∇×H
+      = μ R_H^1/2+ 12∇× r_2,E^0 + Δ t^296ε^-1μ^-1∇×∇×∇× r_1,E^0H,
+==================================================
+Then following the same steps for the initial time step as for general one and further adding it to the general inequality, we arrive at the following inequality:
+==================================================
+η_h^N - 1/2^2_ε^-1 + ζ_h^N - 1/2^2_ε + ξ_h^N^2_μ≤
+    1 + 4 Δ t1 - 4 Δ t[ η_h^0^2_ε^-1 + ζ_h^0^2_ε + ξ_h^0^2_μ] + 8 Δ t1 - 4Δ t∑_n = 0^N - 1[ η_h^n + 1/2^2_ε^-1 + ζ_h^n + 1/2^2_ε +  ξ_h^n + 1^2_μ] + 
+    Δ t1 - 4 Δ t∑_n = 0^N - 1[ [](I - Π_h^0) ∂ p∂ t(t^n)^2_ε^-1 + Δ t^4(24)^2[](I - Π_h^0) ∂^3 p∂ t^3(t^n)^2_ε^-1 + [](I - Π_h^0) R_p^n^2_ε^-1 + [](I - Π_h^1) ∂ E∂ t(t^n)^2_ε
+     + Δ t^4(24)^2[](I - Π_h^1) ∂^3 E∂ t^3(t^n)^2_ε + [](I - Π_h^1) R_E^n^2_ε + [](I - Π_h^2) ∂ H∂ t(t^n + 1/2)^2_μ  + Δ t^4(24)^2[](I - Π_h^2) ∂^3 H∂ t^3(t^n + 1/2)^2_μ + [](I - Π_h^2) R_H^n + 1/2^2_μ
+     + R_p^n^2_ε^-1 + R_E^n^2_ε + R_H^n + 1/2^2_μ + ∇ r_1,p^n ^2_ε^-1 + ∇· r_1,E^n^2_ε + ε^-1μ^-1∇× r_1,E^n^2_ε +  ε^-1μ^-1∇× r_1,H^n + 1/2^2_μ
+==================================================
++  Δ t^4144( ∇∇·∇ r_2,p^n ^2_ε^-1 + ∇·∇∇· r_2,E^n^2_ε + ε^-3μ^-3∇×∇×∇× r_2,E^n^2_ε +  ε^-3μ^-3∇×∇×∇× r_2,H^n + 1/2^2_μ)  ].
+==================================================
+η_h^N - 1/2^2_ε^-1 + ζ_h^N - 1/2^2_ε + ξ_h^N^2_μ≤[ 6 Δ t5∑_n = 0^N - 1( [](I - Π_h^0) ∂ p∂ t(t^n)^2_ε^-1 + Δ t^4(24)^2[](I - Π_h^0) ∂^3 p∂ t^3(t^n)^2_ε^-1 + [](I - Π_h^0) R_p^n^2_ε^-1
+==================================================
++ [](I - Π_h^1) ∂ E∂ t(t^n)^2_ε + Δ t^4(24)^2[](I - Π_h^1) ∂^3 E∂ t^3(t^n)^2_ε + [](I - Π_h^1) R_E^n^2_ε + [](I - Π_h^2) ∂ H∂ t(t^n + 1/2)^2_μ + Δ t^4(24)^2[](I - Π_h^2) ∂^3 H∂ t^3(t^n + 1/2)^2_μ
+     + [](I - Π_h^2) R_H^n + 1/2^2_μ +
+      R_p^n^2_ε^-1 + R_E^n^2_ε + R_H^n + 1/2^2_μ + ∇ r_1,p^n ^2_ε^-1 + ∇· r_1,E^n^2_ε + ε^-1μ^-1∇× r_1,E^n^2_ε +  ε^-1μ^-1∇× r_1,H^n + 1/2^2_μ
+==================================================
++  Δ t^4144( ∇∇·∇ r_2,p^n ^2_ε^-1 + ∇·∇∇· r_2,E^n^2_ε + ε^-3μ^-3∇×∇×∇× r_2,E^n^2_ε +  ε^-3μ^-3∇×∇×∇× r_2,H^n + 1/2^2_μ) ) + 
+    75( η_h^0^2_ε^-1 + ζ_h^0^2_ε + ξ_h^0^2_μ) ] exp( 16 T ).
+==================================================
+Using our estimates for the Taylor remainders from Theorem thm:dscrt_error_estmt_lf4 for these terms on the right hand side of the above inequality, we further get that:
+==================================================
+Δ t ∑_n = 0^N [ R^n_p^2_ε^-1 + R^n_E^2_ε + R^n_H^2_μ] ≤ (Δ t)^8 [ []∂^5 p∂ t^5^2_L^2[0, T] × L^2_ε^-1(Ω) +  []∂^5 E∂ t^5^2_L^2[0, T] × L^2_ε(Ω) +  []∂^5 H∂ t^5^2_L^2[0, T] × L^2_μ(Ω)],
+==================================================
+Δ t ∑_n = 0^N [∇ r_2,p^n ^2_ε^-1 + ∇· r_2,E^n^2_ε + ε^-1μ^-1∇× r_2,E^n^2_ε +  ε^-1μ^-1∇× r_2,H^n + 1/2^2_μ
+==================================================
++  Δ t^4144( ∇∇·∇ r_1,p^n ^2_ε^-1 + ∇·∇∇· r_1,E^n^2_ε + ε^-3μ^-3∇×∇×∇× r_1,E^n^2_ε +  ε^-3μ^-3∇×∇×∇× r_1,H^n + 1/2^2_μ) ] 
+    ≤ (Δ t)^8 [ []∂^4 (∇ p )∂ t^4^2_L^2[0, T] ×H^1_ε^-1(Ω) + 
+      []∂^4 (∇· E)∂ t^4^2_L^2[0, T] × L^2_ε(Ω) + ε^-1μ^-1[]∂^4 (∇× E)∂ t^4^2_L^2[0, T] ×H_ε(; Ω)
+     + ε^-1μ^-1[]∂^4 (∇× H)∂ t^4^2_L^2[0, T] × L^2_μ(Ω) + []∂^2 (∇∇·∇ p )∂ t^2^2_L^2[0, T] ×H^1_ε^-1(Ω) + 
+      []∂^2 (∇·∇∇· E)∂ t^2^2_L^2[0, T] × L^2_ε(Ω)
+     + ε^-1μ^-1[]∂^2 (∇×∇×∇× E)∂ t^2^2_L^2[0, T] ×H_ε(; Ω) + ε^-1μ^-1[]∂^2 (∇×∇×∇× H)∂ t^2^2_L^2[0, T] × L^2_μ(Ω)].
+==================================================
+Now, for p ∈H_ε^-1^1(Ω), E ∈H_ε(; Ω) and H ∈H_μ(; Ω), there exists positive bounded constants C_1, p, C_2, p, C_3, p, C_1, E, C_2, E, C_3, E, C_1, H, C_2, H, and C_3, H such that we have the following error bounds for the L^2 projections:
+==================================================
+[](I - Π_h^0) ∂ p∂ t(t^n)_ε^-1   ≤ C_1, p h^r []∂ p∂ t(t^n)_ε^-1,           [](I - Π_h^0) ∂^3 p∂ t^3(t^n)_ε^-1      ≤ C_2, p h^r []∂^3 p∂ t^3(t^n)_ε^-1,  
+    [](I - Π_h^1) ∂ E∂ t(t^n)_ε   ≤ C_1, E h^r []∂ E∂ t(t^n)_ε,           [](I - Π_h^1) ∂ E∂ t(t^n)_ε      ≤ C_2, E h^r []∂^3 E∂ t^3(t^n)_ε
+    [](I - Π_h^2) ∂ H∂ t(t^n + 1/2)_μ   ≤ C_1, H h^r []∂ H∂ t(t^n + 1/2)_μ,           [](I - Π_h^2) ∂^3 H∂ t^3(t^n + 1/2)_μ      ≤ C_2, H h^r []∂^3 H∂ t^3(t^n + 1/2)_μ,
+==================================================
+[](I - Π_h^0) R_p^n_ε^-1≤ C_3, p h^r []R_p^n_ε^-1,     [](I - Π_h^1) R_E^n_ε≤ C_3, E h^r []R_E^n_ε,     [](I - Π_h^2) R_H^n + 1/2_μ≤ C_3, H h^r []R_H^n + 1/2_μ.
+==================================================
+Set C_0 max{C_1, p, C_2, p, C_3, p, C_1, E, C_2, E, C_3, E, C_1, H, C_2, H, C_3, H}. We therefore have that:
+==================================================
+Δ t ∑_n = 0^N-1[ [](I - Π_h^0) ∂ p∂ t(t^n - 1/2)^2_ε^-1 + [](I - Π_h^1) ∂ E∂ t(t^n - 1/2)^2_ε + [](I - Π_h^2) ∂ H∂ t(t^n - 1/2)^2_μ] 
+    ≤ C_0 h^2 r∑_n = 0^N-1Δ t [ []∂ p∂ t(t^n - 1/2)^2_ε^-1 + []∂ E∂ t(t^n - 1/2)^2_ε + []∂ H∂ t(t^n - 1/2)^2_μ] 
+    ≤ C_0 h^2 r∫_0^T [ []∂ p∂ t(t^n - 1/2)^2_ε^-1 + []∂ E∂ t(t^n - 1/2)^2_ε + []∂ H∂ t(t^n - 1/2)^2_μ] dt
+==================================================
+= C_0 h^2 r[ []∂ p∂ t^2_L^2[0, T] × L^2_ε^-1(Ω) + []∂ E∂ t^2_L^2[0, T] × L^2_ε(Ω) + []∂ H∂ t^2_L^2[0, T] × L^2_μ(Ω)],
+==================================================
+Δ t ∑_n = 0^N-1[ [](I - Π_h^0) ∂^3 p∂ t^3(t^n)^2_ε^-1 + [](I - Π_h^1) ∂^3 E∂ t^3(t^n)^2_ε + [](I - Π_h^2) ∂^3 H∂ t^3(t^n + 1/2)^2_μ] 
+    ≤ C_0 h^2 r∑_n = 0^N-1Δ t [ []∂^3 p∂ t^3(t^n)^2_ε^-1 + []∂^3 E∂ t^3(t^n)^2_ε + []∂^3 H∂ t^3(t^n + 1/2)^2_μ] 
+    ≤ C_0 h^2 r∫_0^T [ []∂^3 p∂ t^3(t^n)^2_ε^-1 + []∂^3 E∂ t^3(t^n)^2_ε + []∂^3 H∂ t^3(t^n + 1/2)^2_μ] dt
+==================================================
+= C_0 h^2 r[ []∂^3 p∂ t^3^2_L^2[0, T] × L^2_ε^-1(Ω) + []∂^3 E∂ t^3^2_L^2[0, T] × L^2_ε(Ω) + []∂^3 H∂ t^3^2_L^2[0, T] × L^2_μ(Ω)],
+==================================================
+Δ t ∑_n = 0^N [ [](I - Π_h^0) R_p^n_ε^-1 + [](I - Π_h^1) R_E^n_ε + [](I - Π_h^2) R_H^n + 1/2_μ], 
+    ≤ C_0 h^2 r∑_n = 0^N  Δ t [ R_p^n_L^2_ε^-1(Ω) + R_E^n_L^2_ε(Ω) + R_H^n + 1/2_L^2_μ(Ω)], 
+    ≤ C_0 h^2 r (Δ t)^8 [ []∂^5 p∂ t^5^2_L^2[0, T] × L^2_ε^-1(Ω) + []∂^5 E∂ t^5^2_L^2[0, T] × L^2_ε(Ω) + []∂^5 H∂ t^5^2_L^2[0, T] × L^2_μ(Ω)].
+==================================================
+Now, we take p_h^0 = Π_h^0 p_0, E_h^0 = Π_h^1 E_0, and H_h^0 = Π_h^2 H_0, and note that there exists positive bounded constants M_1,   M_2,   M_3 and M_4 such that:
+==================================================
+[]∂ p∂ t^2_L^2[0, T] × L^2_ε^-1(Ω) + []∂ E∂ t^2_L^2[0, T] × L^2_ε(Ω) + []∂ H∂ t^2_L^2[0, T] × L^2_μ(Ω)   ≤ M_1, 
+    []∂^3 p∂ t^3^2_L^2[0, T] × L^2_ε^-1(Ω) + []∂^3 E∂ t^3^2_L^2[0, T] × L^2_ε(Ω) + []∂^3 H∂ t^3^2_L^2[0, T] × L^2_μ(Ω)   ≤ M_2, 
+    []∂^5 p∂ t^5^2_L^2[0, T] × L^2_ε^-1(Ω) + []∂^5 E∂ t^5^2_L^2[0, T] × L^2_ε(Ω) + []∂^5 H∂ t^5^2_L^2[0, T] × L^2_μ(Ω)   ≤ M_3,
+==================================================
+[]∂^4 (∇ p )∂ t^4^2_L^2[0, T] ×H^1_ε^-1(Ω) + 
+      []∂^4 (∇· E)∂ t^4^2_L^2[0, T] × L^2_ε(Ω) + ε^-1μ^-1[]∂^4 (∇× E)∂ t^4^2_L^2[0, T] ×H_ε(; Ω)
+     + ε^-1μ^-1[]∂^4 (∇× H)∂ t^4^2_L^2[0, T] × L^2_μ(Ω) + []∂^2 (∇∇·∇ p )∂ t^2^2_L^2[0, T] ×H^1_ε^-1(Ω) + 
+      []∂^2 (∇·∇∇· E)∂ t^2^2_L^2[0, T] × L^2_ε(Ω)
+     + ε^-1μ^-1[]∂^2 (∇×∇×∇× E)∂ t^2^2_L^2[0, T] ×H_ε(; Ω) + ε^-1μ^-1[]∂^2 (∇×∇×∇× H)∂ t^2^2_L^2[0, T] × L^2_μ(Ω)≤ M_4.
+==================================================
+where C = 2 max{C_0 M_1, C_0 M_2, C_0 M_3, M_3, M_4 }exp(16 T) which then using the equivalence between 1- and 2-norms gives us that:
+==================================================
+η^N-1/2_ε^-1    = (I - Π_h^0) p(t^N-1/2)_ε^-1       ≤C_2 h^r p(t^N-1/2)_L^2_ε^-1(Ω)       η^N-1/2_ε^-1       ≤C_2 h^r,
+==================================================
+ζ^N-1/2_ε    = (I - Π_h^1) E(t^N-1/2)_ε       ≤C_3 h^r E(t^N-1/2)_L^2_ε(Ω)       ζ^N-1/2_ε       ≤C_3 h^r,
+==================================================
+in which C_2 = C_2p(t^N-1/2)_L^2_ε^-1(Ω), C_3 = C_3E(t^N-1/2)_L^2_ε(Ω) and C_4 = C_4H(t^N)_L^2_μ(Ω) are all bounded positive constants due to Theorem <ref>. Finally, this provides us with our desired result by choosing C = C_1 + C_2 + C_3 + C_4:
+==================================================
+e_p_h^N - 1/2_ε^-1 + e_E_h^N - 1/2_ε + e_H_h^N_μ   = η^N - 1/2 - η^N - 1/2_h_ε^-1 + ζ^N - 1/2 - ζ^N - 1/2_h_ε + ξ^N - ξ^N_h_μ
+       ≤ C [ (Δ t )^4 + h^r + h^r (Δ t)^4 ].
+==================================================
+For the semidiscretization using the R^th (R even) order implicit leapfrog scheme as given in Equations eqn:maxwell_p_lfR,eqn:maxwell_E_lfR,eqn:maxwell_H_lfR,eqn:maxwell_p0_lfR,eqn:maxwell_E0_lfR,eqn:maxwell_H0_lfR, for any time step Δ t sufficiently small, there exists a positive bounded constant C independent of Δ t such that:
+==================================================
+For the semidiscretization using the R^th (R even) order implicit leapfrog scheme as given in Equations eqn:maxwell_p_lfR,eqn:maxwell_E_lfR,eqn:maxwell_H_lfR, and  eqn:maxwell_p0_lfR,eqn:maxwell_E0_lfR,eqn:maxwell_H0_lfR, for the solution (p, E, H) of Equations eqn:maxwell_p_wf,eqn:maxwell_E_wf,eqn:maxwell_H_wf with initial conditions as in Equation (<ref>) and assuming sufficient regularity with p ∈ C^R+1[0, T] ×H^1_ε^-1(Ω), E ∈ C^R+1[0, T] ×H_ε(; Ω), and H ∈ C^R+1[0, T] ×H_μ(; Ω), and for the time step Δ t sufficiently small, there exists a positive bounded constant C independent of Δ t such that:
+==================================================
+where e_p^n + 1/2 p(t^n + 1/2) - p^n+1/2, e_E^n + 1/2 E(t^n + 1/2) - E^n + 1/2 and e_H^n  H(t^n) - H^n are the errors in the time semidiscretization of p, E and H, respectively and at the indicated time indices.
+==================================================
+For the implicit leapfrog scheme as in Equations eqn:maxwell_p_lfR,eqn:maxwell_E_lfR,eqn:maxwell_H_lfR, using a de Rham sequence of finite dimensional subspaces of the corresponding function spaces for the spatial discretization of (p^n + 1/2, E^n + 1/2, H^n + 1), we obtain the following discrete problem: find (p_h^n + 1/2, E_h^n + 1/2, H_h^n + 1) ∈ U_h × V_h × W_h ⊆H_ε^-1^1 ×H_ε(; Ω) ×H_μ(; Ω) such that:
+==================================================
+p_h^n + 1/2 - p_h^n - 1/2Δ tp - ε2( E_h^n + 1/2 + E_h^n - 1/2)∇p
+     + ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟 C_k_1𝔣(𝔞) ε2 (∇∇·)^∑_𝔪 = 1^𝔞 k_𝔪( E_h^n + 1/2 + E_h^n - 1/2)∇p =0,
+==================================================
+12∇(p_h^n + 1/2 + p_h^n - 1/2)E - ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟 C_k_1𝔣(𝔞) 12∇(p_h^n + 1/2 + p_h^n - 1/2)( ∇∇·)^∑_𝔪 = 1^𝔞 k_𝔪E
+     + εE_h^n + 1/2 - E_h^n - 1/2Δ tE -  12( H_h^n + 1 + H_h^n )∇×E
+      + ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟 C_k_1𝔣( 𝔞) (-1)^∑_𝔪 = 1^𝔞 k_𝔪12 ( με )^-∑_𝔪 = 1^𝔞 k_𝔪( ∇×∇×)^∑_𝔪 = 1^𝔞 k_𝔪( H_h^n + 1 + H_h^n )∇×E = 0,
+==================================================
+μH_h^n + 1 - H_h^nΔ tH +  12∇×( E_h^n + 1/2 + E_h^n - 1/2)H
+     - ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟 C_k_1𝔣(𝔞) (-1)^∑_𝔪 = 1^𝔞 k_𝔪12 (εμ)^-∑_𝔪 = 1^𝔞 k_𝔪∇×( E_h^n + 1/2 + E_h^n - 1/2)( ∇×∇×)^∑_𝔪 = 1^𝔞 k_𝔪H = 0,
+==================================================
+for all (p, E, H) ∈ U_h × V_h × W_h, and for n ∈{1, …, N - 1}. 
+The n = 0 bootstrapping as in Equations eqn:maxwell_p0_lfR,eqn:maxwell_E0_lfR,eqn:maxwell_H0_lfR leads to the discrete problem: find (p_h^1/2, E_h^1/2, H_h^1) ∈ U_h × V_h × W_h ⊆H_ε^-1^1 ×H_ε(; Ω) ×H_μ(; Ω) such that:
+==================================================
+p_h^1/2 - p_h^0Δ t/2p - 12ε2( E_h^1/2 + E_h^0 )∇p + ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟C_k_12^2 ∑_𝔪 = 1^𝔞 k_𝔪 + 1𝔣( 𝔞) ε2 (∇∇·)^∑_𝔪 = 1^𝔞 k_𝔪( E_h^1/2 + E_h^0 )∇p  = 0,
+==================================================
+1212∇(  p_h^1/2 +  p_h^0 )E - ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟C_k_12^2 ∑_𝔪 = 1^𝔞 k_𝔪 + 1𝔣(𝔞) 12∇(p_h^1/2 + p_h^0 )( ∇∇·)^∑_𝔪 = 1^𝔞 k_𝔪E
+     + εE_h^1/2 - E_h^0Δ t/2E  - 12( H_h^1 + H_h^0 )∇×E
+     + ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟C_k_12^2 ∑_𝔪 = 1^𝔞 k_𝔪𝔣( 𝔞) (-1)^∑_𝔪 = 1^𝔞 k_𝔪12 ( με )^-∑_𝔪 = 1^𝔞 k_𝔪( ∇×∇×)^∑_𝔪 = 1^𝔞 k_𝔪( H_h^1 + H_h^0 )∇×E = 0,
+==================================================
+μH_h^1 - H_h^0Δ tH + 1212∇×(E_h^1/2 + E_h^0 )H
+     - ∑_𝔞 = 1^R/2 - 1∑_k_𝔞 = 1^R/2 - 1 - ∑_𝔟 = 1^𝔞 - 1 k_𝔟C_k_12^2 ∑_𝔪 = 1^𝔞 k_𝔪 + 1𝔣(𝔞) (-1)^∑_𝔪 = 1^𝔞 k_𝔪12 (εμ)^-∑_𝔪 = 1^𝔞 k_𝔪∇×( E_h^1/2 + E_h^0 )( ∇×∇×)^∑_𝔪 = 1^𝔞 k_𝔪H = 0,
+==================================================
+With this, we can now state our theorem for convergence of error in the full discretization of the system of Maxwell's equations using the R^th (R even) order implicit leap-frog scheme.
+==================================================
+Let p ∈ C^R+1[0, T] ×H^1_ε^-1(Ω), E ∈ C^R+1[0, T] ×H_ε(; Ω), and H ∈ C^R+1[0, T] ×H_μ(; Ω) be the solution to the variational formulation of the Maxwell's equations as in Equations eqn:maxwell_p_wf,eqn:maxwell_E_wf,eqn:maxwell_H_wf, and let (p_h^n + 1/2, E_h^n + 1/2, H_h^n + 1) be the solution of the fully discretized Maxwell's equations using the R^th (R even) order implicit leapfrog scheme as in Equations eqn:maxwell_p_lfR_full,eqn:maxwell_E_lfR_full,eqn:maxwell_H_lfR_full,eqn:maxwell_p0_lfR_full,eqn:maxwell_E0_lfR_full,eqn:maxwell_H0_lfR_full. If the fixed time step Δ t > 0 and the mesh parameter h > 0 are sufficiently small, then there exists a positive bounded constant C independent of both Δ t and h such that the following error estimate holds:
+==================================================
+where the finite element subspaces U_h, V_h and W_h are each spanned by their respective Whitney form basis of polynomial order r ≥ 1.
+==================================================
+We are in the process of explicating the proofs of the various characterizing theorems for our LF_R scheme, and we hope to complete the process of providing the excruciating details of these proofs in an updated version of this preprint in the very near future. We also shall be supplementing our theoretical claims with computational validating results on model problems.
+==================================================

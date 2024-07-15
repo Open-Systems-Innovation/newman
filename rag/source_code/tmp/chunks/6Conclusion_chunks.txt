@@ -1,5 +1,0 @@
-Chunk 1:
-In this work, we present , a novel unsupervised document refinement framework that enhances the performance of RAG systems. The  framework aids RAG systems to generate more accurate answers by decomposing passages into sentences, re-ranking them based on each relevance score, and then reconstructing them to preserve the continuity and coherence of the context. Our comprehensive experiments on multiple QA datasets show that  consistently outperforms the conventional approaches of using fixed-size passage in RAG, especially in ever-evolving and domain-specific contexts. Our ablation studies highlight the importance of sentence-level re-ranking and contextual reconstruction for improvement on RAG. We believe that  suggests a promising research direction for refining document retrieval without additional training, together with potential applications across a wide range of knowledge-intensive NLP tasks by integrating more diverse retrieval or ranking models.
-
-==================================================
-

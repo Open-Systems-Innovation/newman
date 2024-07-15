@@ -1,0 +1,1 @@
+My goal is to create the scafolding of a program that uses PETSc to solve Maxwell's equations in the time domain. The program should take in a mesh file. It should break down all the steps of the finite element method into parts that can later be implemented. 
