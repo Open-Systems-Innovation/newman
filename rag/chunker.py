@@ -46,11 +46,11 @@ class Chunker:
         print(f"length of sentences is: {len(self.sentences)}")
         self.embed_sentences()
         sentence_id = 0
-        while sentence_id < len(self.sentences):
+        while sentence_id < len(self.sentences)-1:
             current_chunk = ""
             character_count = 0
             while character_count < self.max_chunk_size: 
-                if sentence_id >= len(self.sentences):
+                if sentence_id >= len(self.sentences)-1:
                     break
                 current_chunk += self.sentences[sentence_id]
                 character_count += len(self.sentences[sentence_id])

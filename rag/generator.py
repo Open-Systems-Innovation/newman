@@ -6,5 +6,5 @@ class Generator:
         self.prompt = prompt
         self.response = ""
     
-    def run(self, augmented_prompt):
-        self.response = ollama.generate(model='llama3', prompt=augmented_prompt)
+    def run(self):
+        self.response = ollama.generate(model=self.model, prompt=self.prompt)['response']
