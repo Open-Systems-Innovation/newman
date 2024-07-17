@@ -1,0 +1,1 @@
+A PETSc finite element code that solves a hyperbolic conservation equation consists of many parts. What are those parts? Break them down into simple building blocks.

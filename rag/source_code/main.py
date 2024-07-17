@@ -2,6 +2,7 @@ import sys
 import os
 from vector_database_manager import VectorDatabaseManager
 from response_generator import ResponseGenerator
+from prompt_augmentor import PromptAugmentor
 
 if __name__ == "__main__":
 
@@ -22,7 +23,8 @@ if __name__ == "__main__":
     n_similar_results = 10
     
     # Set paths
-    data_files = "../data/fem"
+    latex_data_files = "../data/fem"
+    pdf_data_files = "../data/fem_textbooks"
     vector_database = "./fem_vector_database"
     
     # Check for command line arguments
@@ -30,12 +32,13 @@ if __name__ == "__main__":
     print_prompt = "-print-prompt" in sys.argv
     
     # Initialize database manager
-    db_manager = VectorDatabaseManager(vector_database, data_files)
+    db_manager = VectorDatabaseManager(vector_database, latex_data_files, pdf_data_files)
     
     # Create or update database if flag is present, or if the database doesn't exist
     if update_database or not os.path.exists(vector_database):
         print("\nCreating/Updating database...")
-        db_manager.process_and_add_paragraphs()
+        db_manager.process_and_add_pdf_paragraphs()
+        db_manager.process_and_add_latex_paragraphs()
     else:
         print("\nUsing existing database...")
     
@@ -45,28 +48,17 @@ if __name__ == "__main__":
         n_results=n_similar_results
     )
 
-    # Concatenate the original prompt with the retrieved paragraphs
-    augmented_prompt = prompt + "\n\n"
-    
-    print("\nReferences used:")
-    used_sources = {}
-    for result, metadata, id in zip(results["documents"][0], results["metadatas"][0], results["ids"][0]):
-        augmented_prompt += result + "\n\n"
-        source = metadata["source"]
-        chunk_id = id.split('_')[-1]  # Assuming id format is "source_chunknum"
-        
-        if source not in used_sources:
-            used_sources[source] = []
-        used_sources[source].append(chunk_id)
-
-    for source, chunks in used_sources.items():
-        print(f"- {source}: chunks {', '.join(chunks)}")
-    
+    prompt_agumentor = PromptAugmentor(max_chunks=n_similar_results)
+    augmented_prompt = prompt_agumentor.create_augmented_prompt(prompt, results)
+   
     # Print the augmented prompt if the flag is present
     if print_prompt:
         print("\nAugmented Prompt:")
         print(augmented_prompt)
-    
+        
+    with open("./augmented_prompt.txt", 'w') as f:
+        f.write(augmented_prompt)
+        
     print("\nGenerating response...")
     response_generator = ResponseGenerator()
     response_generator.run(augmented_prompt)

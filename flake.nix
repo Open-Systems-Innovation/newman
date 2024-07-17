@@ -24,6 +24,7 @@
               # pkgs.petsc
               # pkgs.mpich
               # pkgs.clangd
+              pkgs.zulu  # a java runtime for tika
               #  # Python packages
               (pkgs.python3.withPackages (python-pkgs: [
                 python-pkgs.python-lsp-server
@@ -37,6 +38,8 @@
                 python-pkgs.pylatexenc # to parase the LaTeX documents in RAG
                 python-pkgs.chromadb  # the embedding database
                 python-pkgs.sentence-transformers
+                python-pkgs.tika
+                python-pkgs.pypdf
               ]))
             ];
 
